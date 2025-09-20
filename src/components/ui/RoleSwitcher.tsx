@@ -7,6 +7,8 @@ export function RoleSwitcher() {
 
   const roles = [
     { value: 'admin', label: 'Admin', color: 'bg-red-100 text-red-800' },
+    { value: 'manager', label: 'Manager', color: 'bg-orange-100 text-orange-800' },
+    { value: 'qualityControl', label: 'Quality Control', color: 'bg-pink-100 text-pink-800' },
     { value: 'intake', label: 'Intake', color: 'bg-blue-100 text-blue-800' },
     { value: 'caseManager', label: 'Case Manager', color: 'bg-green-100 text-green-800' },
     { value: 'accountant', label: 'Accountant', color: 'bg-yellow-100 text-yellow-800' },
