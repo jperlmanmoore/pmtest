@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '../ui/Card';
 import { formatDate, getStageColor } from '../../utils/helpers';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
+import { useTasks } from '../../hooks/useTasks';
 
 interface CasesTableProps {
   cases: Case[];
@@ -18,6 +19,24 @@ export function CasesTable({ cases }: CasesTableProps) {
   const router = useRouter();
   const [sortBy, setSortBy] = useState<SortField>('dateOfLoss');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+  // Get tasks for all cases to display task counts
+  const { tasks: allTasks } = useTasks();
+
+  const getTaskStats = (caseId: string) => {
+    const caseTasks = allTasks.filter(task => task.caseId === caseId);
+    const total = caseTasks.length;
+    const completed = caseTasks.filter(t => t.status === 'completed').length;
+    const inProgress = caseTasks.filter(t => t.status === 'in_progress').length;
+    const pending = caseTasks.filter(t => t.status === 'pending').length;
+    const overdue = caseTasks.filter(t =>
+      t.dueDate &&
+      new Date(t.dueDate) < new Date() &&
+      t.status !== 'completed'
+    ).length;
+
+    return { total, completed, inProgress, pending, overdue };
+  };
 
   const handleRowClick = (caseId: string) => {
     router.push(`/cases/${caseId}`);
@@ -153,6 +172,9 @@ export function CasesTable({ cases }: CasesTableProps) {
                 <SortableHeader field="dateOfLoss">
                   Date of Loss
                 </SortableHeader>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tasks
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -190,6 +212,31 @@ export function CasesTable({ cases }: CasesTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatDate(caseItem.dateOfLoss)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {(() => {
+                      const stats = getTaskStats(caseItem._id);
+                      return (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-900">{stats.total} total</span>
+                          {stats.completed > 0 && (
+                            <Badge className="bg-green-100 text-green-800 text-xs">
+                              {stats.completed} done
+                            </Badge>
+                          )}
+                          {stats.inProgress > 0 && (
+                            <Badge className="bg-yellow-100 text-yellow-800 text-xs">
+                              {stats.inProgress} active
+                            </Badge>
+                          )}
+                          {stats.overdue > 0 && (
+                            <Badge className="bg-red-100 text-red-800 text-xs">
+                              {stats.overdue} overdue
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                 </tr>
                 );
