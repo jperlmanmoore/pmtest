@@ -8,13 +8,24 @@ import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { MetricsCards } from '../components/dashboard/MetricsCards';
 import { CasesByStageSummary } from '../components/dashboard/CasesByStageSummary';
 import { CaseForm } from '../components/forms/CaseForm';
+import { AdminDashboard } from '../components/dashboard/AdminDashboard';
+import { IntakeDashboard } from '../components/dashboard/IntakeDashboard';
+import { CaseManagerDashboard } from '../components/dashboard/CaseManagerDashboard';
+import { AccountantDashboard } from '../components/dashboard/AccountantDashboard';
+import { AttorneyDashboard } from '../components/dashboard/AttorneyDashboard';
+import { useUser } from '../contexts/UserContext';
 
 export default function Dashboard() {
   const { cases, clients, loading, addCase, updateCase } = useCases();
+  const { isIntake } = useUser();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | null>(null);
 
   const metrics = calculateMetrics(cases);
+
+  // Filter cases for intake users to only show intake-stage cases
+  const displayCases = isIntake ? cases.filter(c => c.stage === 'intake') : cases;
+  const displayMetrics = isIntake ? calculateMetrics(displayCases) : metrics;
 
   const handleAddCase = () => {
     setShowAddForm(!showAddForm);
@@ -49,14 +60,21 @@ export default function Dashboard() {
       <DashboardHeader onAddCase={handleAddCase} showAddForm={showAddForm} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <MetricsCards metrics={metrics} />
+        {!isIntake && <MetricsCards metrics={displayMetrics} />}
 
-        <CasesByStageSummary cases={cases} />
+        {!isIntake && <CasesByStageSummary cases={displayCases} />}
+
+        {/* Role-Specific Dashboards */}
+        <AdminDashboard />
+        <IntakeDashboard />
+        <CaseManagerDashboard />
+        <AccountantDashboard />
+        <AttorneyDashboard />
 
         {showAddForm && (
           <CaseForm
             clients={clients}
-            cases={cases}
+            cases={displayCases}
             editingCase={editingCase}
             onSubmit={handleFormSubmit}
             onCancel={() => {

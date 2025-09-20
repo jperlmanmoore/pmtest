@@ -1,4 +1,5 @@
 import { Button } from '../ui/Button';
+import { RoleSwitcher } from '../ui/RoleSwitcher';
 
 interface DashboardHeaderProps {
   onAddCase: () => void;
@@ -14,7 +15,8 @@ export function DashboardHeader({ onAddCase, showAddForm }: DashboardHeaderProps
             <h1 className="text-3xl font-bold text-gray-900">Practice Dashboard</h1>
             <p className="text-gray-600 mt-1">Manage your personal injury cases</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
+            <RoleSwitcher />
             <Button onClick={onAddCase}>
               {showAddForm ? 'Cancel' : '+ Add Case'}
             </Button>
