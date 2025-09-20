@@ -61,6 +61,9 @@ export interface Case {
   anteLitemDeadline?: string;
   parentCaseId?: string; // For linking related cases from the same incident
 
+  // Attorney Assignment
+  assignedAttorney?: { _id: string; name: string };
+
   // Close Request Workflow
   closeRequested?: boolean;
   closeRequestedBy?: string; // User ID who requested the close
@@ -133,6 +136,9 @@ export interface CaseFormData {
   anteLitemAgency: string;
   anteLitemDeadline: string;
   parentCaseId?: string; // For linking related cases from the same incident
+
+  // Attorney Assignment
+  assignedAttorney?: string;
 
   // Close Request Workflow
   closeRequested?: boolean;

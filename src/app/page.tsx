@@ -64,7 +64,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!isIntake && <MetricsCards metrics={displayMetrics} />}
 
-        {!isIntake && <CasesByStageSummary cases={displayCases} />}
+        {!isIntake && !isQualityControl && <CasesByStageSummary cases={displayCases} />}
 
         {/* Role-Specific Dashboards */}
         <AdminDashboard />
