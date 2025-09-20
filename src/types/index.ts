@@ -64,6 +64,9 @@ export interface Case {
   // Attorney Assignment
   assignedAttorney?: { _id: string; name: string };
 
+  // Task Management
+  tasks?: Task[];
+
   // Close Request Workflow
   closeRequested?: boolean;
   closeRequestedBy?: string; // User ID who requested the close
@@ -171,10 +174,56 @@ export interface CaseFormData {
   statuteOfLimitations?: StatuteOfLimitations;
 }
 
-export interface DashboardMetrics {
-  openCases: number;
-  closedCases: number;
-  anteLitemCases: number;
-  overOneYearCases: number;
-  solCases: number;
+export interface Task {
+  _id: string;
+  caseId: string;
+  title: string;
+  description?: string;
+  stage: 'intake' | 'opening' | 'treating' | 'demandPrep' | 'negotiation' | 'settlement' | 'resolution' | 'probate' | 'litigation' | 'resign' | 'terminate' | 'closed';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assignedTo?: {
+    _id: string;
+    name: string;
+    role: 'attorney' | 'caseManager';
+  };
+  assignedBy: string; // User ID who assigned the task
+  assignedAt: string;
+  dueDate?: string;
+  completedAt?: string;
+  completedBy?: string;
+  isStandard: boolean; // Whether this is from a standard template
+  templateId?: string; // Reference to the template if it's a standard task
+  notes?: string;
+  dependencies?: string[]; // Task IDs that must be completed first
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskTemplate {
+  _id: string;
+  name: string;
+  description?: string;
+  stage: 'intake' | 'opening' | 'treating' | 'demandPrep' | 'negotiation' | 'settlement' | 'resolution' | 'probate' | 'litigation' | 'resign' | 'terminate' | 'closed';
+  tasks: {
+    title: string;
+    description?: string;
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    estimatedDays?: number; // Days from case creation to complete
+    dependencies?: string[]; // Task template IDs that must be completed first
+    assignedToRole?: 'attorney' | 'caseManager'; // Default role assignment
+  }[];
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskAssignment {
+  taskId: string;
+  userId: string;
+  userName: string;
+  userRole: 'attorney' | 'caseManager';
+  assignedAt: string;
+  assignedBy: string;
 }

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { getStageColor, formatDate } from '../../utils/helpers';
 import { useRouter } from 'next/navigation';
+import { useTasks } from '../../hooks/useTasks';
 
 interface CasesByStageProps {
   cases: Case[];
@@ -12,6 +13,7 @@ interface CasesByStageProps {
 
 export function CasesByStage({ cases }: CasesByStageProps) {
   const router = useRouter();
+  const { tasks: allTasks } = useTasks();
 
   // Group cases by stage
   const casesByStage = cases.reduce((acc, caseItem) => {
@@ -22,6 +24,20 @@ export function CasesByStage({ cases }: CasesByStageProps) {
     acc[stage].push(caseItem);
     return acc;
   }, {} as Record<string, Case[]>);
+
+  const getTaskStats = (caseId: string) => {
+    const caseTasks = allTasks.filter(task => task.caseId === caseId);
+    const total = caseTasks.length;
+    const completed = caseTasks.filter(t => t.status === 'completed').length;
+    const inProgress = caseTasks.filter(t => t.status === 'in_progress').length;
+    const overdue = caseTasks.filter(t =>
+      t.dueDate &&
+      new Date(t.dueDate) < new Date() &&
+      t.status !== 'completed'
+    ).length;
+
+    return { total, completed, inProgress, overdue };
+  };
 
   // Define stage order for consistent display
   const stageOrder = [
@@ -104,6 +120,24 @@ export function CasesByStage({ cases }: CasesByStageProps) {
                             <p className="text-xs text-gray-500 mt-1">
                               {formatDate(caseItem.dateOfLoss)}
                             </p>
+                            {(() => {
+                              const stats = getTaskStats(caseItem._id);
+                              return stats.total > 0 ? (
+                                <div className="flex items-center space-x-2 mt-2">
+                                  <span className="text-xs text-gray-600">{stats.total} tasks</span>
+                                  {stats.completed > 0 && (
+                                    <Badge className="bg-green-100 text-green-800 text-xs px-1 py-0">
+                                      {stats.completed}
+                                    </Badge>
+                                  )}
+                                  {stats.overdue > 0 && (
+                                    <Badge className="bg-red-100 text-red-800 text-xs px-1 py-0">
+                                      {stats.overdue} overdue
+                                    </Badge>
+                                  )}
+                                </div>
+                              ) : null;
+                            })()}
                           </div>
                           <div className="ml-2 flex-shrink-0">
                             <span className="text-xs text-gray-500">

@@ -4,14 +4,17 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Case } from '../../../types';
 import { useCases } from '../../../hooks/useCases';
+import { useTasks } from '../../../hooks/useTasks';
 import { Button } from '../../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
+import { TaskList } from '../../../components/TaskList';
 
 export default function CaseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { cases, loading, getWitnessesForCase } = useCases();
+  const { tasks, updateTask, deleteTask, loading: tasksLoading } = useTasks(params.id as string);
   const [caseData, setCaseData] = useState<Case | null>(null);
 
   useEffect(() => {
@@ -239,6 +242,21 @@ export default function CaseDetailPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Task Management */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold text-gray-900">Task Management</h2>
+              </CardHeader>
+              <CardContent>
+                <TaskList
+                  tasks={tasks}
+                  onTaskUpdate={updateTask}
+                  onTaskDelete={deleteTask}
+                  loading={tasksLoading}
+                />
+              </CardContent>
+            </Card>
 
             {/* Witnesses */}
             {(() => {
