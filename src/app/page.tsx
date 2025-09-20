@@ -13,11 +13,13 @@ import { IntakeDashboard } from '../components/dashboard/IntakeDashboard';
 import { CaseManagerDashboard } from '../components/dashboard/CaseManagerDashboard';
 import { AccountantDashboard } from '../components/dashboard/AccountantDashboard';
 import { AttorneyDashboard } from '../components/dashboard/AttorneyDashboard';
+import { ManagerDashboard } from '../components/dashboard/ManagerDashboard';
+import { QualityControlDashboard } from '../components/dashboard/QualityControlDashboard';
 import { useUser } from '../contexts/UserContext';
 
 export default function Dashboard() {
   const { cases, clients, loading, addCase, updateCase } = useCases();
-  const { isIntake } = useUser();
+  const { isIntake, isManager, isQualityControl } = useUser();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | null>(null);
 
@@ -66,6 +68,8 @@ export default function Dashboard() {
 
         {/* Role-Specific Dashboards */}
         <AdminDashboard />
+        <ManagerDashboard />
+        <QualityControlDashboard />
         <IntakeDashboard />
         <CaseManagerDashboard />
         <AccountantDashboard />

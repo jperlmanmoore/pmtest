@@ -11,8 +11,10 @@ interface UserContextType {
   isCaseManager: boolean;
   isAccountant: boolean;
   isIntake: boolean;
-  switchTestRole: (role: 'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => void;
-  currentTestRole: 'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+  isManager: boolean;
+  isQualityControl: boolean;
+  switchTestRole: (role: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => void;
+  currentTestRole: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -24,6 +26,20 @@ const testUsers: Record<string, User> = {
     email: 'admin@test.com',
     name: 'Admin User',
     role: 'admin',
+  },
+  manager: {
+    _id: 'manager-1',
+    email: 'manager@test.com',
+    name: 'Manager',
+    role: 'admin',
+    subgroup: 'manager',
+  },
+  qualityControl: {
+    _id: 'qc-1',
+    email: 'qc@test.com',
+    name: 'Quality Control',
+    role: 'admin',
+    subgroup: 'qualityControl',
   },
   intake: {
     _id: 'intake-1',
@@ -53,11 +69,11 @@ const testUsers: Record<string, User> = {
 
 export function UserProvider({ children }: { children: ReactNode }) {
   // Get initial role from localStorage or default to admin
-  const [currentTestRole, setCurrentTestRole] = useState<'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney'>('admin');
+  const [currentTestRole, setCurrentTestRole] = useState<'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney'>('admin');
 
   // Load role from localStorage on mount
   useEffect(() => {
-    const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+    const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
     if (savedRole && testUsers[savedRole]) {
       setCurrentTestRole(savedRole);
     }
@@ -72,9 +88,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const isCaseManager = currentUser?.role === 'caseManager';
   const isAccountant = currentUser?.role === 'accountant';
   const isIntake = currentUser?.role === 'intake';
+  const isManager = currentUser?.role === 'admin' && currentUser?.subgroup === 'manager';
+  const isQualityControl = currentUser?.role === 'admin' && currentUser?.subgroup === 'qualityControl';
 
   // Function to switch test role
-  const switchTestRole = (role: 'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => {
+  const switchTestRole = (role: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => {
     setCurrentTestRole(role);
     localStorage.setItem('testUserRole', role);
   };
@@ -88,6 +106,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       isCaseManager,
       isAccountant,
       isIntake,
+      isManager,
+      isQualityControl,
       switchTestRole,
       currentTestRole,
     }}>

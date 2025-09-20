@@ -117,6 +117,7 @@ export interface User {
   email: string;
   name: string;
   role: 'admin' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+  subgroup?: 'manager' | 'qualityControl'; // Admin subgroups
   createdAt?: string;
   updatedAt?: string;
 }
