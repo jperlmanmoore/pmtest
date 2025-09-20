@@ -25,6 +25,7 @@ export function useCases() {
           anteLitemRequired: true,
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-03-15',
+          assignedAttorney: { _id: 'attorney-1', name: 'Sarah Johnson' },
           statuteOfLimitations: {
             solDate: '2026-01-15',
             solType: 'personalInjury',
@@ -47,6 +48,7 @@ export function useCases() {
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-03-15',
           parentCaseId: '1', // Child case linked to case #1
+          assignedAttorney: { _id: 'attorney-1', name: 'Sarah Johnson' },
           statuteOfLimitations: {
             solDate: '2026-01-15',
             solType: 'personalInjury',
@@ -68,6 +70,7 @@ export function useCases() {
           anteLitemRequired: true,
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-05-10',
+          assignedAttorney: { _id: 'attorney-2', name: 'Michael Chen' },
           statuteOfLimitations: {
             solDate: '2026-03-10',
             solType: 'personalInjury',
@@ -107,6 +110,7 @@ export function useCases() {
           dateOfLoss: '2024-02-20',
           dateOfIncident: '2024-02-20',
           anteLitemRequired: false,
+          assignedAttorney: { _id: 'attorney-3', name: 'Emily Rodriguez' },
           statuteOfLimitations: {
             solDate: '2026-02-20',
             solType: 'personalInjury',
@@ -126,6 +130,7 @@ export function useCases() {
           dateOfLoss: '2024-06-08',
           dateOfIncident: '2024-06-08',
           anteLitemRequired: false,
+          assignedAttorney: { _id: 'attorney-2', name: 'Michael Chen' },
           statuteOfLimitations: {
             solDate: '2026-06-08',
             solType: 'personalInjury',
@@ -147,6 +152,7 @@ export function useCases() {
           anteLitemRequired: true,
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-09-22',
+          assignedAttorney: { _id: 'attorney-1', name: 'Sarah Johnson' },
           statuteOfLimitations: {
             solDate: '2026-07-22',
             solType: 'personalInjury',
@@ -187,6 +193,7 @@ export function useCases() {
           anteLitemRequired: true,
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-11-03',
+          assignedAttorney: { _id: 'attorney-3', name: 'Emily Rodriguez' },
           statuteOfLimitations: {
             solDate: '2026-09-03',
             solType: 'personalInjury',
