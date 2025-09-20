@@ -36,6 +36,18 @@ function CasesPageContent() {
     return stageNames[stage] || stage.charAt(0).toUpperCase() + stage.slice(1);
   };
 
+  const getFilterDisplayName = (filter: string): string => {
+    const filterNames: Record<string, string> = {
+      urgent: 'SOL Alert Cases',
+      recent: 'Recent Cases',
+      closed: 'Closed Cases',
+      antelitem: 'Ante Litem Cases',
+      overyear: 'Cases Over 1 Year',
+      solalert: 'SOL Alert Cases'
+    };
+    return filterNames[filter] || filter.charAt(0).toUpperCase() + filter.slice(1);
+  };
+
   const filteredCases = useMemo(() => {
     let filtered = getMainCases();
     
@@ -61,6 +73,23 @@ function CasesPageContent() {
       filtered = filtered.filter(caseItem => 
         new Date(caseItem.createdAt || caseItem.dateOfLoss) > thirtyDaysAgo
       );
+    } else if (filterType === 'closed') {
+      filtered = filtered.filter(caseItem => caseItem.stage === 'closed');
+    } else if (filterType === 'antelitem') {
+      filtered = filtered.filter(caseItem => caseItem.anteLitemRequired);
+    } else if (filterType === 'overyear') {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      filtered = filtered.filter(caseItem => new Date(caseItem.dateOfLoss) < oneYearAgo);
+    } else if (filterType === 'solalert') {
+      const now = new Date();
+      const sixMonthsFromNow = new Date();
+      sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+      filtered = filtered.filter(caseItem => {
+        const sol = new Date(caseItem.dateOfLoss);
+        sol.setFullYear(sol.getFullYear() + 2);
+        return sol <= sixMonthsFromNow && sol >= now;
+      });
     }
     
     return filtered;
@@ -242,16 +271,19 @@ function CasesPageContent() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {stageFilter ? `${getStageDisplayName(stageFilter)} Cases` : 'All Cases'}
+            {stageFilter ? `${getStageDisplayName(stageFilter)} Cases` : 
+             filterType ? getFilterDisplayName(filterType) : 'All Cases'}
           </h1>
-          {stageFilter && (
+          {(stageFilter || filterType) && (
             <div className="flex items-center space-x-2 mt-2">
-              <Badge className={getStageColor(stageFilter)}>
-                Filtered by: {getStageDisplayName(stageFilter)}
-              </Badge>
+              {stageFilter && (
+                <Badge className={getStageColor(stageFilter)}>
+                  Filtered by: {getStageDisplayName(stageFilter)}
+                </Badge>
+              )}
               {filterType && (
                 <Badge variant="default">
-                  {filterType === 'urgent' ? 'Urgent Cases' : 'Recent Cases'}
+                  {getFilterDisplayName(filterType)}
                 </Badge>
               )}
               <Button
