@@ -169,6 +169,12 @@ function CasesPageContent() {
           )}
         </div>
         <div className="flex items-center space-x-4">
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/overview')}
+          >
+            📊 Overview
+          </Button>
           <RoleSwitcher />
           <Button
             onClick={() => setShowAddForm(true)}

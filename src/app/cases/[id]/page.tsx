@@ -14,8 +14,9 @@ export default function CaseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { cases, loading, getWitnessesForCase } = useCases();
-  const { tasks, updateTask, deleteTask, loading: tasksLoading } = useTasks(params.id as string);
+  const caseId = params.id as string;
   const [caseData, setCaseData] = useState<Case | null>(null);
+  const { tasks, updateTask, assignTask, completeTask, loading: tasksLoading } = useTasks(caseId);
 
   useEffect(() => {
     if (params.id && cases.length > 0) {
@@ -24,7 +25,17 @@ export default function CaseDetailPage() {
         setCaseData(foundCase);
       }
     }
-  }, [params.id, cases]);
+  }, [params.id, cases, loading]);
+
+  useEffect(() => {
+    console.log('=== DEBUG TASK LOADING ===');
+    console.log('Case ID from params:', params.id);
+    console.log('Case ID variable:', caseId);
+    console.log('Case Data:', caseData);
+    console.log('Tasks:', tasks);
+    console.log('Tasks Loading:', tasksLoading);
+    console.log('Tasks Length:', tasks.length);
+  }, [caseId, caseData, tasks, tasksLoading, params.id]);
 
   if (loading) {
     return (
@@ -67,13 +78,20 @@ export default function CaseDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <Button
-                onClick={() => router.push('/')}
-                variant="secondary"
-                className="mb-4"
-              >
-                ← Back to Dashboard
-              </Button>
+              <div className="flex items-center space-x-4 mb-4">
+                <Button
+                  onClick={() => router.push('/')}
+                  variant="secondary"
+                >
+                  ← Back to Dashboard
+                </Button>
+                <Button
+                  onClick={() => router.push('/overview')}
+                  variant="secondary"
+                >
+                  📊 Overview
+                </Button>
+              </div>
               <h1 className="text-3xl font-bold text-gray-900">{caseData.title}</h1>
               <p className="text-gray-600 mt-1">Case Number: {caseData.caseNumber}</p>
             </div>
@@ -249,10 +267,29 @@ export default function CaseDetailPage() {
                 <h2 className="text-xl font-semibold text-gray-900">Task Management</h2>
               </CardHeader>
               <CardContent>
+                {/* Debug Display */}
+                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+                  <h3 className="font-bold text-sm mb-2">DEBUG: Task Data</h3>
+                  <div className="text-xs space-y-1">
+                    <p><strong>Case ID:</strong> {caseId}</p>
+                    <p><strong>Tasks Count:</strong> {tasks.length}</p>
+                    <p><strong>Loading:</strong> {tasksLoading ? 'Yes' : 'No'}</p>
+                    <p><strong>Tasks:</strong></p>
+                    <div className="ml-2">
+                      {tasks.map(task => (
+                        <div key={task._id} className="text-xs">
+                          • {task.title} (ID: {task._id}, Case: {task.caseId})
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 <TaskList
                   tasks={tasks}
-                  onTaskUpdate={updateTask}
-                  onTaskDelete={deleteTask}
+                  onAssignTask={assignTask}
+                  onCompleteTask={completeTask}
+                  onUpdateTask={updateTask}
                   loading={tasksLoading}
                 />
               </CardContent>

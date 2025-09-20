@@ -1,8 +1,15 @@
 'use client';
 
-import { DashboardMetrics } from '../../types';
 import { Card } from '../ui/Card';
 import { useRouter } from 'next/navigation';
+
+interface DashboardMetrics {
+  openCases: number;
+  closedCases: number;
+  anteLitemCases: number;
+  overOneYearCases: number;
+  solCases: number;
+}
 
 interface MetricsCardsProps {
   metrics: DashboardMetrics;
@@ -19,6 +26,14 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
       color: 'bg-blue-500',
       clickable: true,
       onClick: () => router.push('/cases'),
+    },
+    {
+      title: 'Case Review Checklist',
+      value: '',
+      icon: '📋',
+      color: 'bg-purple-500',
+      clickable: true,
+      onClick: () => router.push('/overview'),
     },
     {
       title: 'Closed Cases',
@@ -55,7 +70,7 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
       {cards.map((card) => (
         <Card
           key={card.title}
@@ -70,7 +85,7 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">{card.title}</p>
-              <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+              <p className="text-2xl font-bold text-gray-900">{card.value || 'View'}</p>
             </div>
           </div>
         </Card>
