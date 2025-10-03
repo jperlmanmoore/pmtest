@@ -71,6 +71,7 @@ export function useCases() {
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2024-05-10',
           assignedAttorney: { _id: 'attorney-2', name: 'Michael Chen' },
+          showInChecklist: true, // Allow this settlement case to show in checklist
           statuteOfLimitations: {
             solDate: '2026-03-10',
             solType: 'personalInjury',
@@ -131,6 +132,7 @@ export function useCases() {
           dateOfIncident: '2024-06-08',
           anteLitemRequired: false,
           assignedAttorney: { _id: 'attorney-2', name: 'Michael Chen' },
+          showInChecklist: false, // This negotiation case is not shown in checklist by default
           statuteOfLimitations: {
             solDate: '2026-06-08',
             solType: 'personalInjury',
@@ -259,6 +261,7 @@ export function useCases() {
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2025-01-15',
           parentCaseId: '11',
+          showInChecklist: true, // Allow this negotiation case to show in checklist
           statuteOfLimitations: {
             solDate: '2026-11-15',
             solType: 'personalInjury',
@@ -281,6 +284,7 @@ export function useCases() {
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2025-01-15',
           parentCaseId: '11',
+          showInChecklist: false, // This settlement case is not shown in checklist by default
           statuteOfLimitations: {
             solDate: '2026-11-15',
             solType: 'personalInjury',
@@ -366,6 +370,7 @@ export function useCases() {
           anteLitemAgency: 'State Medical Board',
           anteLitemDeadline: '2025-02-01',
           parentCaseId: '16',
+          showInChecklist: true, // Allow this negotiation case to show in checklist
           statuteOfLimitations: {
             solDate: '2026-12-01',
             solType: 'personalInjury',
@@ -502,6 +507,14 @@ export function useCases() {
     setCases(prev => prev.filter(c => c._id !== id));
   };
 
+  const toggleChecklistVisibility = (id: string) => {
+    setCases(prev => prev.map(c =>
+      c._id === id
+        ? { ...c, showInChecklist: !c.showInChecklist }
+        : c
+    ));
+  };
+
   // Filter out witness cases from main case list
   const getMainCases = () => {
     return cases.filter(c => !c.title.toLowerCase().includes('witness'));
@@ -519,6 +532,7 @@ export function useCases() {
     addCase,
     updateCase,
     deleteCase,
+    toggleChecklistVisibility,
     getMainCases,
     getWitnessesForCase,
   };

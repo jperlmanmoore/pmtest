@@ -95,15 +95,15 @@ export function CasesByStageSummary({ cases }: CasesByStageSummaryProps) {
   };
 
   const handleViewAll = (stage: string) => {
-    router.push(`/cases?stage=${stage}`);
+    router.push(`/overview?stage=${stage}`);
   };
 
   const handleViewUrgent = (stage: string) => {
-    router.push(`/cases?stage=${stage}&filter=urgent`);
+    router.push(`/overview?stage=${stage}&filter=urgent`);
   };
 
   const handleViewRecent = (stage: string) => {
-    router.push(`/cases?stage=${stage}&filter=recent`);
+    router.push(`/overview?stage=${stage}&filter=recent`);
   };
 
   if (cases.length === 0) {

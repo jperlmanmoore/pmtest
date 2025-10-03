@@ -61,6 +61,9 @@ export interface Case {
   anteLitemDeadline?: string;
   parentCaseId?: string; // For linking related cases from the same incident
 
+  // Checklist visibility control
+  showInChecklist?: boolean; // For negotiation/settlement cases - allows them to appear in the task checklist
+
   // Attorney Assignment
   assignedAttorney?: { _id: string; name: string };
 
@@ -139,6 +142,9 @@ export interface CaseFormData {
   anteLitemAgency: string;
   anteLitemDeadline: string;
   parentCaseId?: string; // For linking related cases from the same incident
+
+  // Checklist visibility control
+  showInChecklist?: boolean; // For negotiation/settlement cases - allows them to appear in the task checklist
 
   // Attorney Assignment
   assignedAttorney?: string;

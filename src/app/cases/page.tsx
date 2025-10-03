@@ -10,7 +10,7 @@ import { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { getStageColor } from '../../utils/helpers';
-import { RoleSwitcher } from '../../components/ui/RoleSwitcher';
+import { DashboardHeader } from '../../components/dashboard/DashboardHeader';
 import { useUser } from '../../contexts/UserContext';
 
 function CasesPageContent() {
@@ -21,8 +21,8 @@ function CasesPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const stageFilter = searchParams.get('stage');
-  const filterType = searchParams.get('filter');
+  const stageFilter = searchParams?.get('stage');
+  const filterType = searchParams?.get('filter');
 
   const getStageDisplayName = (stage: string): string => {
     const stageNames: Record<string, string> = {
@@ -105,10 +105,6 @@ function CasesPageContent() {
     return filtered;
   }, [cases, stageFilter, filterType, getMainCases, isIntake]);
 
-  const clearFilters = () => {
-    window.location.href = '/cases';
-  };
-
   const handleFormSubmit = (formData: CaseFormData) => {
     if (editingCase) {
       updateCase(editingCase._id, formData);
@@ -121,43 +117,55 @@ function CasesPageContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading cases...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading cases...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
+    <div className="min-h-screen bg-gray-50">
+      <DashboardHeader onAddCase={() => setShowAddForm(true)} showAddForm={showAddForm} />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
             {stageFilter ? `${getStageDisplayName(stageFilter)} Cases` : 
              filterType ? getFilterDisplayName(filterType) : 'All Cases'}
           </h1>
+          <p className="text-gray-600 mt-1">
+            {(stageFilter || filterType) ? 
+              'Filtered view of cases' :
+              'Complete list of all cases in the system'
+            }
+          </p>
           {(stageFilter || filterType) && (
-            <div className="flex items-center space-x-2 mt-2">
+            <div className="flex items-center space-x-2 mt-3">
               {stageFilter && (
                 <Badge className={getStageColor(stageFilter)}>
-                  Filtered by: {getStageDisplayName(stageFilter)}
+                  Stage: {getStageDisplayName(stageFilter)}
                 </Badge>
               )}
               {filterType && (
                 <Badge variant="default">
-                  {getFilterDisplayName(filterType)}
+                  Filter: {getFilterDisplayName(filterType)}
                 </Badge>
               )}
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={clearFilters}
+                onClick={() => router.push('/cases')}
               >
                 Clear Filters
               </Button>
             </div>
           )}
-          {!stageFilter && (
-            <div className="flex items-center space-x-2 mt-2">
+          {!stageFilter && !filterType && (
+            <div className="flex items-center space-x-2 mt-3">
               <Button
                 variant="secondary"
                 size="sm"
@@ -165,46 +173,38 @@ function CasesPageContent() {
               >
                 View Closed Cases
               </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => router.push('/overview')}
+              >
+                📊 Task Overview
+              </Button>
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="secondary"
-            onClick={() => router.push('/overview')}
-          >
-            📊 Overview
-          </Button>
-          <RoleSwitcher />
-          <Button
-            onClick={() => setShowAddForm(true)}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            Add New Case
-          </Button>
-        </div>
-      </div>
 
-      {showAddForm && (
-        <div className="mb-6">
-          <CaseForm
-            clients={clients}
-            cases={isIntake ? filteredCases : cases}
-            editingCase={editingCase}
-            onSubmit={handleFormSubmit}
-            onCancel={() => {
-              setShowAddForm(false);
-              setEditingCase(null);
-            }}
+        {showAddForm && (
+          <div className="mb-6">
+            <CaseForm
+              clients={clients}
+              cases={isIntake ? filteredCases : cases}
+              editingCase={editingCase}
+              onSubmit={handleFormSubmit}
+              onCancel={() => {
+                setShowAddForm(false);
+                setEditingCase(null);
+              }}
+            />
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg shadow">
+          <CasesTable
+            cases={filteredCases}
           />
         </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow">
-        <CasesTable
-          cases={filteredCases}
-        />
-      </div>
+      </main>
     </div>
   );
 }

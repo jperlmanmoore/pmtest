@@ -9,33 +9,34 @@ import { Button } from '../../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { TaskList } from '../../../components/TaskList';
+import { DashboardHeader } from '../../../components/dashboard/DashboardHeader';
 
 export default function CaseDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { cases, loading, getWitnessesForCase } = useCases();
-  const caseId = params.id as string;
+  const { cases, loading, getWitnessesForCase, toggleChecklistVisibility } = useCases();
+  const caseId = params?.id as string;
   const [caseData, setCaseData] = useState<Case | null>(null);
   const { tasks, updateTask, assignTask, completeTask, loading: tasksLoading } = useTasks(caseId);
 
   useEffect(() => {
-    if (params.id && cases.length > 0) {
+    if (params?.id && cases.length > 0) {
       const foundCase = cases.find(c => c._id === params.id);
       if (foundCase) {
         setCaseData(foundCase);
       }
     }
-  }, [params.id, cases, loading]);
+  }, [params?.id, cases, loading]);
 
   useEffect(() => {
     console.log('=== DEBUG TASK LOADING ===');
-    console.log('Case ID from params:', params.id);
+    console.log('Case ID from params:', params?.id);
     console.log('Case ID variable:', caseId);
     console.log('Case Data:', caseData);
     console.log('Tasks:', tasks);
     console.log('Tasks Loading:', tasksLoading);
     console.log('Tasks Length:', tasks.length);
-  }, [caseId, caseData, tasks, tasksLoading, params.id]);
+  }, [caseId, caseData, tasks, tasksLoading, params?.id]);
 
   if (loading) {
     return (
@@ -73,41 +74,37 @@ export default function CaseDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <div className="flex items-center space-x-4 mb-4">
-                <Button
-                  onClick={() => router.push('/')}
-                  variant="secondary"
-                >
-                  ← Back to Dashboard
-                </Button>
-                <Button
-                  onClick={() => router.push('/overview')}
-                  variant="secondary"
-                >
-                  📊 Overview
-                </Button>
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">{caseData.title}</h1>
-              <p className="text-gray-600 mt-1">Case Number: {caseData.caseNumber}</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge className={getStageColor(caseData.stage)}>
-                {caseData.stage}
-              </Badge>
-              <Button onClick={() => router.push(`/cases/${caseData._id}/edit`)}>
-                Edit Case
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader onAddCase={() => {}} showAddForm={false} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">{caseData.title}</h1>
+          <p className="text-gray-600 mt-1">Case Number: {caseData.caseNumber}</p>
+          <div className="flex items-center space-x-4 mt-4">
+            <Badge className={getStageColor(caseData.stage)}>
+              {caseData.stage}
+            </Badge>
+            {(caseData.stage === 'negotiation' || caseData.stage === 'settlement') && (
+              <Button
+                onClick={() => toggleChecklistVisibility(caseData._id)}
+                variant={caseData.showInChecklist ? "primary" : "secondary"}
+                className={caseData.showInChecklist ? "bg-green-600 hover:bg-green-700" : ""}
+              >
+                {caseData.showInChecklist ? "📋 In Checklist" : "📋 Add to Checklist"}
+              </Button>
+            )}
+            <Button onClick={() => router.push(`/cases/${caseData._id}/edit`)}>
+              Edit Case
+            </Button>
+            <Button
+              onClick={() => router.push('/overview')}
+              variant="secondary"
+            >
+              📊 Overview
+            </Button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">

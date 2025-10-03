@@ -1,5 +1,7 @@
 'use client';
 
+console.log('OVERVIEW PAGE: File loaded and executing');
+
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
@@ -8,7 +10,9 @@ import { Button } from '../../components/ui/Button';
 import { useCases } from '../../hooks/useCases';
 import { useTasks } from '../../hooks/useTasks';
 import { useUser } from '../../contexts/UserContext';
+import { DashboardHeader } from '../../components/dashboard/DashboardHeader';
 import { Case, Task } from '../../types';
+import { useSearchParams } from 'next/navigation';
 
 // Task columns organized by case stage
 const TASK_COLUMNS_BY_STAGE = {
@@ -80,17 +84,35 @@ export default function OverviewPage() {
   const { cases, loading: casesLoading } = useCases();
   const { tasks, loading: tasksLoading, updateTask } = useTasks();
   const { isIntake } = useUser();
-  const [filterStage, setFilterStage] = useState('all');
+  const searchParams = useSearchParams();
+  const [filterStage, setFilterStage] = useState(searchParams?.get('stage') || 'all');
+  const [additionalFilter, setAdditionalFilter] = useState(searchParams?.get('filter') || '');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [sortBy, setSortBy] = useState<'taskType' | 'client' | 'dueDate'>('dueDate');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Add comprehensive debugging
-  console.log('=== CHECKLIST DEBUG ===');
-  console.log('Current User:', useUser());
-  console.log('All Cases:', cases);
-  console.log('All Tasks:', tasks);
-  console.log('Cases Loading:', casesLoading);
-  console.log('Tasks Loading:', tasksLoading);
-  console.log('Filter Stage:', filterStage);
-  console.log('Is Intake User:', isIntake);
+  const getStageDisplayName = (stage: string): string => {
+    const stageNames: Record<string, string> = {
+      intake: 'Intake',
+      opening: 'Opening',
+      treating: 'Treating',
+      demandPrep: 'Demand Prep',
+      negotiation: 'Negotiation',
+      settlement: 'Settlement',
+      resolution: 'Resolution',
+      probate: 'Probate',
+      closed: 'Closed'
+    };
+    return stageNames[stage] || stage.charAt(0).toUpperCase() + stage.slice(1);
+  };
+
+  const getFilterDisplayName = (filter: string): string => {
+    const filterNames: Record<string, string> = {
+      urgent: 'Urgent Cases (SOL Alert)',
+      recent: 'Recent Cases'
+    };
+    return filterNames[filter] || filter.charAt(0).toUpperCase() + filter.slice(1);
+  };
 
   // Filter cases based on user role and stage
   const filteredCases = useMemo(() => {
@@ -99,9 +121,37 @@ export default function OverviewPage() {
     // Exclude intake cases from overview display
     filtered = filtered.filter(c => c.stage !== 'intake');
 
-    // Apply stage filter
+    // Default filter: only show treating and demandPrep cases
+    // Plus negotiation/settlement cases that have showInChecklist enabled
+    filtered = filtered.filter(c => {
+      if (c.stage === 'treating' || c.stage === 'demandPrep') {
+        return true;
+      }
+      if ((c.stage === 'negotiation' || c.stage === 'settlement') && c.showInChecklist) {
+        return true;
+      }
+      return false;
+    });
+
+    // Apply stage filter if not "all"
     if (filterStage !== 'all') {
       filtered = filtered.filter(c => c.stage === filterStage);
+    }
+
+    // Apply additional filters
+    if (additionalFilter === 'urgent') {
+      const now = new Date();
+      const ninetyDaysFromNow = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter(caseItem => {
+        if (!caseItem.statuteOfLimitations) return false;
+        const solDate = new Date(caseItem.statuteOfLimitations.solDate);
+        return solDate <= ninetyDaysFromNow && solDate >= now;
+      });
+    } else if (additionalFilter === 'recent') {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter(caseItem => 
+        new Date(caseItem.createdAt || caseItem.dateOfLoss) > thirtyDaysAgo
+      );
     }
 
     // Apply role-based filtering (intake users only see intake cases)
@@ -113,7 +163,7 @@ export default function OverviewPage() {
     console.log('Filtered Cases Count:', filtered.length);
 
     return filtered;
-  }, [cases, filterStage, isIntake]);
+  }, [cases, filterStage, additionalFilter, isIntake]);
 
   // Create matrix data: case -> task -> status
   const caseTaskMatrix = useMemo(() => {
@@ -170,6 +220,55 @@ export default function OverviewPage() {
 
     return matrix;
   }, [filteredCases, tasks]);
+
+  // Create flattened task list for table view
+  const flattenedTasks = useMemo(() => {
+    const taskList: Array<{
+      task: Task;
+      case: Case;
+      isOverdue: boolean;
+    }> = [];
+
+    filteredCases.forEach(caseItem => {
+      const caseTasks = tasks.filter(task => task.caseId === caseItem._id);
+      
+      caseTasks.forEach(task => {
+        const isOverdue = !!(task.dueDate && new Date(task.dueDate) < new Date() && task.status === 'pending');
+        taskList.push({
+          task,
+          case: caseItem,
+          isOverdue
+        });
+      });
+    });
+
+    return taskList;
+  }, [filteredCases, tasks]);
+
+  // Sort flattened tasks for table view
+  const sortedTasks = useMemo(() => {
+    return [...flattenedTasks].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case 'taskType':
+          comparison = a.task.title.localeCompare(b.task.title);
+          break;
+        case 'client':
+          comparison = (a.case.clientId?.name || '').localeCompare(b.case.clientId?.name || '');
+          break;
+        case 'dueDate':
+          const aDate = a.task.dueDate ? new Date(a.task.dueDate).getTime() : Infinity;
+          const bDate = b.task.dueDate ? new Date(b.task.dueDate).getTime() : Infinity;
+          comparison = aDate - bDate;
+          break;
+        default:
+          comparison = 0;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [flattenedTasks, sortBy, sortOrder]);
 
   // Handle task status updates
   const handleTaskClick = async (caseId: string, taskName: string, currentTask: Task | null, caseStage: string) => {
@@ -236,27 +335,50 @@ export default function OverviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Case Progress Checkoff Grid</h1>
-              <p className="text-gray-600 mt-1">Visual overview of task completion across all cases</p>
-            </div>
-            <div className="flex items-center space-x-6">
-              <Button
-                onClick={() => router.push('/')}
-                variant="secondary"
-              >
-                ← Back to Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader onAddCase={() => {}} showAddForm={false} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {filterStage !== 'all' ? `${getStageDisplayName(filterStage)} Cases` :
+             additionalFilter ? getFilterDisplayName(additionalFilter) :
+             viewMode === 'grid' ? 'Case Progress Checkoff Grid' : 'Case Review Task List'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {(filterStage !== 'all' || additionalFilter) ? 
+              'Filtered view of case progress and task completion' :
+              viewMode === 'grid' 
+                ? 'Visual overview of task completion across all cases'
+                : 'Detailed task list with sorting and filtering options'
+            }
+          </p>
+          {(filterStage !== 'all' || additionalFilter) && (
+            <div className="flex items-center space-x-2 mt-3">
+              {filterStage !== 'all' && (
+                <Badge variant="default">
+                  Stage: {getStageDisplayName(filterStage)}
+                </Badge>
+              )}
+              {additionalFilter && (
+                <Badge variant="warning">
+                  Filter: {getFilterDisplayName(additionalFilter)}
+                </Badge>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setFilterStage('all');
+                  setAdditionalFilter('');
+                  router.push('/overview');
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
+        </div>
         <div className="space-y-6">
           {/* Loading State */}
           {casesLoading || tasksLoading ? (
@@ -269,22 +391,76 @@ export default function OverviewPage() {
           ) : (
             <>
               {/* Filter Controls */}
-              <div className="flex justify-end gap-4">
-                <select
-                  value={filterStage}
-                  onChange={(e) => setFilterStage(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md"
-                  aria-label="Filter cases by stage"
-                >
-                  <option value="all">All Stages</option>
-                  <option value="treating">Treating</option>
-                  <option value="demandPrep">Demand Prep</option>
-                  <option value="negotiation">Negotiation</option>
-                  <option value="settlement">Settlement</option>
-                  <option value="resolution">Resolution</option>
-                  <option value="closed">Closed</option>
-                </select>
-                <Button variant="secondary">Export Report</Button>
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium ${
+                      viewMode === 'grid'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Grid View
+                  </button>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium ${
+                      viewMode === 'table'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Table View
+                  </button>
+                </div>
+                <div className="flex gap-4">
+                  {viewMode === 'table' && (
+                    <div className="flex gap-2">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'taskType' | 'client' | 'dueDate')}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        aria-label="Sort tasks by"
+                      >
+                        <option value="dueDate">Sort by Due Date</option>
+                        <option value="taskType">Sort by Task Type</option>
+                        <option value="client">Sort by Client</option>
+                      </select>
+                      <button
+                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+                        title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+                      >
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </button>
+                    </div>
+                  )}
+                  <select
+                    value={filterStage}
+                    onChange={(e) => {
+                      const newStage = e.target.value;
+                      setFilterStage(newStage);
+                      setAdditionalFilter(''); // Clear additional filter when changing stage
+                      if (newStage === 'all') {
+                        router.push('/overview');
+                      } else {
+                        router.push(`/overview?stage=${newStage}`);
+                      }
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-md"
+                    aria-label="Filter cases by stage"
+                  >
+                    <option value="all">All Stages</option>
+                    <option value="treating">Treating</option>
+                    <option value="demandPrep">Demand Prep</option>
+                    <option value="negotiation">Negotiation</option>
+                    <option value="settlement">Settlement</option>
+                    <option value="resolution">Resolution</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                  <Button variant="secondary">Export Report</Button>
+                </div>
               </div>
 
               {/* Summary Stats */}
@@ -322,117 +498,214 @@ export default function OverviewPage() {
               </div>
 
               {/* Checkoff Grid */}
-              <Card>
-                <CardHeader>
-                  <h3 className="text-lg font-semibold">Task Progress Matrix</h3>
-                  <p className="text-sm text-gray-600">Click any cell to update task status</p>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1200px]">
-                      <thead>
-                        <tr className="border-b bg-gray-50">
-                          <th className="text-left p-4 font-semibold sticky left-0 bg-gray-50 z-10 min-w-[200px]">
-                            Case Details
-                          </th>
-                          {TASK_COLUMNS.map(taskName => (
-                            <th key={taskName} className="text-center p-2 font-semibold text-xs min-w-[80px]">
-                              <div className="transform -rotate-45 origin-center h-16 flex items-end justify-center">
-                                {taskName}
-                              </div>
+              {viewMode === 'grid' && (
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-lg font-semibold">Task Progress Matrix</h3>
+                    <p className="text-sm text-gray-600">Click any cell to update task status</p>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[1200px]">
+                        <thead>
+                          <tr className="border-b bg-gray-50">
+                            <th className="text-left p-4 font-semibold sticky left-0 bg-gray-50 z-10 min-w-[200px]">
+                              Case Details
                             </th>
-                          ))}
-                          <th className="text-center p-4 font-semibold min-w-[100px]">Progress</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(caseTaskMatrix).map(([caseId, caseData]) => {
-                          console.log(`Rendering case row: ${caseId} - ${caseData.case.title}`);
-                          console.log(`Case tasks:`, Object.keys(caseData.tasks));
-                          console.log(`Case stats:`, caseData.stats);
-
-                          return (
-                          <tr key={caseId} className="border-b hover:bg-gray-50">
-                            {/* Case Details Column */}
-                            <td className="p-4 sticky left-0 bg-white z-10">
-                              <div className="min-w-[200px]">
-                                <div className="font-medium text-gray-900 cursor-pointer hover:text-blue-600"
-                                     onClick={() => router.push(`/cases/${caseId}`)}>
-                                  {caseData.case.title}
+                            {TASK_COLUMNS.map(taskName => (
+                              <th key={taskName} className="text-center p-2 font-semibold text-xs min-w-[80px]">
+                                <div className="transform -rotate-45 origin-center h-16 flex items-end justify-center">
+                                  {taskName}
                                 </div>
-                                <div className="text-sm text-gray-600">{caseData.case.clientId?.name}</div>
-                                <div className="flex gap-2 mt-1">
-                                  <Badge className={getStageColor(caseData.case.stage)}>
-                                    {caseData.case.stage}
-                                  </Badge>
-                                  <span className="text-xs text-gray-500">
-                                    {new Date(caseData.case.dateOfLoss).toLocaleDateString()}
-                                  </span>
+                              </th>
+                            ))}
+                            <th className="text-center p-4 font-semibold min-w-[100px]">Progress</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Object.entries(caseTaskMatrix).map(([caseId, caseData]) => {
+                            console.log(`Rendering case row: ${caseId} - ${caseData.case.title}`);
+                            console.log(`Case tasks:`, Object.keys(caseData.tasks));
+                            console.log(`Case stats:`, caseData.stats);
+
+                            return (
+                            <tr key={caseId} className="border-b hover:bg-gray-50">
+                              {/* Case Details Column */}
+                              <td className="p-4 sticky left-0 bg-white z-10">
+                                <div className="min-w-[200px]">
+                                  <div className="font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                                       onClick={() => router.push(`/cases/${caseId}`)}>
+                                    {caseData.case.title}
+                                  </div>
+                                  <div className="text-sm text-gray-600">{caseData.case.clientId?.name}</div>
+                                  <div className="flex gap-2 mt-1">
+                                    <Badge className={getStageColor(caseData.case.stage)}>
+                                      {caseData.case.stage}
+                                    </Badge>
+                                    <span className="text-xs text-gray-500">
+                                      {new Date(caseData.case.dateOfLoss).toLocaleDateString()}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
+                              </td>
 
-                            {/* Task Status Columns */}
-                            {TASK_COLUMNS.map(taskName => {
-                              const task = caseData.tasks[taskName];
-                              const status = task ? task.status : 'pending';
+                              {/* Task Status Columns */}
+                              {TASK_COLUMNS.map(taskName => {
+                                const task = caseData.tasks[taskName];
+                                const status = task ? task.status : 'pending';
 
-                              // Only show as overdue if task is actually overdue AND not completed or in progress
-                              const isOverdue = task && task.dueDate && new Date(task.dueDate) < new Date() && status === 'pending';
-                              const displayStatus = isOverdue ? 'overdue' : status;
+                                // Only show as overdue if task is actually overdue AND not completed or in progress
+                                const isOverdue = task && task.dueDate && new Date(task.dueDate) < new Date() && status === 'pending';
+                                const displayStatus = isOverdue ? 'overdue' : status;
 
-                              const config = STATUS_CONFIG[displayStatus];
+                                const config = STATUS_CONFIG[displayStatus];
 
-                              console.log(`Rendering task: ${taskName} for case ${caseId}`, {
-                                task: task ? { id: task._id, status: task.status } : null,
-                                status,
-                                isOverdue,
-                                displayStatus,
-                                config
-                              });
+                                console.log(`Rendering task: ${taskName} for case ${caseId}`, {
+                                  task: task ? { id: task._id, status: task.status } : null,
+                                  status,
+                                  isOverdue,
+                                  displayStatus,
+                                  config
+                                });
 
-                              return (
-                                <td key={taskName} className="text-center p-2">
-                                  <div
-                                    className={`w-8 h-8 ${config.color} rounded cursor-pointer hover:opacity-80 flex items-center justify-center text-white font-bold transition-all duration-200 mx-auto`}
-                                    onClick={() => handleTaskClick(caseId, taskName, task, caseData.case.stage)}
-                                    title={`${config.label}${task && task.dueDate ? ` - Due: ${new Date(task.dueDate).toLocaleDateString()}` : ''}`}
-                                  >
-                                    {config.symbol}
+                                return (
+                                  <td key={taskName} className="text-center p-2">
+                                    <div
+                                      className={`w-8 h-8 ${config.color} rounded cursor-pointer hover:opacity-80 flex items-center justify-center text-white font-bold transition-all duration-200 mx-auto`}
+                                      onClick={() => handleTaskClick(caseId, taskName, task, caseData.case.stage)}
+                                      title={`${config.label}${task && task.dueDate ? ` - Due: ${new Date(task.dueDate).toLocaleDateString()}` : ''}`}
+                                    >
+                                      {config.symbol}
+                                    </div>
+                                  </td>
+                                );
+                              })}
+
+                              {/* Progress Column */}
+                              <td className="p-4">
+                                <div className="min-w-[100px]">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-sm font-medium">
+                                      {getCompletionPercentage(caseData.stats)}%
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      ({caseData.stats.completed}/{caseData.stats.total})
+                                    </span>
+                                  </div>
+                                    <div
+                                      className="w-full bg-gray-200 rounded-full h-2"
+                                    >
+                                      <div
+                                        className={`bg-green-500 h-2 rounded-full transition-all duration-300`}
+                                        style={{ width: `${getCompletionPercentage(caseData.stats)}%` }}
+                                      ></div>
+                                    </div>
+                                </div>
+                              </td>
+                            </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Task Table View */}
+              {viewMode === 'table' && (
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-lg font-semibold">Task List</h3>
+                    <p className="text-sm text-gray-600">
+                      Sorted by {sortBy === 'dueDate' ? 'Due Date' : sortBy === 'taskType' ? 'Task Type' : 'Client'} 
+                      ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
+                    </p>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[800px]">
+                        <thead>
+                          <tr className="border-b bg-gray-50">
+                            <th className="text-left p-4 font-semibold">Task</th>
+                            <th className="text-left p-4 font-semibold">Case</th>
+                            <th className="text-left p-4 font-semibold">Client</th>
+                            <th className="text-left p-4 font-semibold">Stage</th>
+                            <th className="text-left p-4 font-semibold">Status</th>
+                            <th className="text-left p-4 font-semibold">Due Date</th>
+                            <th className="text-left p-4 font-semibold">Priority</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sortedTasks.map(({ task, case: caseItem, isOverdue }) => {
+                            const config = STATUS_CONFIG[isOverdue ? 'overdue' : task.status];
+
+                            return (
+                              <tr key={task._id} className="border-b hover:bg-gray-50">
+                                <td className="p-4">
+                                  <div>
+                                    <div className="font-medium text-gray-900">{task.title}</div>
+                                    {task.description && (
+                                      <div className="text-sm text-gray-600 mt-1">{task.description}</div>
+                                    )}
                                   </div>
                                 </td>
-                              );
-                            })}
-
-                            {/* Progress Column */}
-                            <td className="p-4">
-                              <div className="min-w-[100px]">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-sm font-medium">
-                                    {getCompletionPercentage(caseData.stats)}%
-                                  </span>
-                                  <span className="text-xs text-gray-500">
-                                    ({caseData.stats.completed}/{caseData.stats.total})
-                                  </span>
-                                </div>
-                                  <div
-                                    className="w-full bg-gray-200 rounded-full h-2"
+                                <td className="p-4">
+                                  <div 
+                                    className="font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                                    onClick={() => router.push(`/cases/${caseItem._id}`)}
                                   >
-                                    <div
-                                      className={`bg-green-500 h-2 rounded-full transition-all duration-300`}
-                                      style={{ width: `${getCompletionPercentage(caseData.stats)}%` }}
-                                    ></div>
+                                    {caseItem.title}
                                   </div>
-                              </div>
-                            </td>
-                          </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
+                                  <div className="text-sm text-gray-600">
+                                    {new Date(caseItem.dateOfLoss).toLocaleDateString()}
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="text-gray-900">{caseItem.clientId?.name || 'Unknown'}</div>
+                                </td>
+                                <td className="p-4">
+                                  <Badge className={getStageColor(caseItem.stage)}>
+                                    {caseItem.stage}
+                                  </Badge>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`w-6 h-6 ${config.color} rounded cursor-pointer hover:opacity-80 flex items-center justify-center text-white font-bold text-xs`}
+                                      onClick={() => handleTaskClick(caseItem._id, task.title, task, caseItem.stage)}
+                                      title={`Click to change status: ${config.label}`}
+                                    >
+                                      {config.symbol}
+                                    </div>
+                                    <span className="text-sm">{config.label}</span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
+                                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
+                                    {isOverdue && <span className="ml-2 text-xs">(Overdue)</span>}
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <Badge className={
+                                    task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                                    task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }>
+                                    {task.priority || 'low'}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Legend */}
               <Card>

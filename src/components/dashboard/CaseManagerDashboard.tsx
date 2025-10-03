@@ -6,6 +6,8 @@ import { Button } from '../ui/Button';
 import { useCases } from '../../hooks/useCases';
 import { useUser } from '../../contexts/UserContext';
 import { CaseSearch } from './CaseSearch';
+import { StatuteOfLimitationsAlert } from './StatuteOfLimitationsAlert';
+import { AnteLitemAlert } from './AnteLitemAlert';
 import { Case } from '../../types';
 
 export function CaseManagerDashboard() {
@@ -39,6 +41,12 @@ export function CaseManagerDashboard() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Statute of Limitations Alert */}
+      <StatuteOfLimitationsAlert title="Cases Within 6 Months of SOL" />
+
+      {/* Ante Litem Alert */}
+      <AnteLitemAlert title="Cases Requiring Ante Litem Notice" />
+
       {/* Active Cases */}
       <Card>
         <CardHeader>
