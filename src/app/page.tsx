@@ -62,7 +62,7 @@ export default function Dashboard() {
       <DashboardHeader onAddCase={handleAddCase} showAddForm={showAddForm} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!isIntake && <MetricsCards metrics={displayMetrics} />}
+        {!isIntake && <MetricsCards metrics={displayMetrics} cases={displayCases} />}
 
         {!isIntake && !isQualityControl && <CasesByStageSummary cases={displayCases} />}
 

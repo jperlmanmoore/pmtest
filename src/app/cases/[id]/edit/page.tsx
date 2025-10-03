@@ -8,6 +8,7 @@ import { Button } from '../../../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../../../components/ui/Card';
 import { InsuranceForm } from '../../../../components/forms/InsuranceForm';
 import { MedicalProviderForm } from '../../../../components/forms/MedicalProviderForm';
+import { DashboardHeader } from '../../../../components/dashboard/DashboardHeader';
 
 export default function EditCasePage() {
   const params = useParams();
@@ -47,7 +48,7 @@ export default function EditCasePage() {
   });
 
   useEffect(() => {
-    if (params.id && cases.length > 0) {
+    if (params?.id && cases.length > 0) {
       const foundCase = cases.find(c => c._id === params.id);
       if (foundCase) {
         setCaseData(foundCase);
@@ -85,11 +86,11 @@ export default function EditCasePage() {
         });
       }
     }
-  }, [params.id, cases]);
+  }, [params?.id, cases]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (caseData && params.id) {
+    if (caseData && params?.id) {
       updateCase(params.id as string, formData);
       router.push(`/cases/${params.id}`);
     }
@@ -199,26 +200,21 @@ export default function EditCasePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <Button
-                onClick={() => router.push(`/cases/${params.id}`)}
-                variant="secondary"
-                className="mb-4"
-              >
-                ← Back to Case Details
-              </Button>
-              <h1 className="text-3xl font-bold text-gray-900">Edit Case</h1>
-              <p className="text-gray-600 mt-1">{caseData.title}</p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader onAddCase={() => {}} showAddForm={false} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <Button
+            onClick={() => router.push(`/cases/${params?.id}`)}
+            variant="secondary"
+            className="mb-4"
+          >
+            ← Back to Case Details
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">Edit Case</h1>
+          <p className="text-gray-600 mt-1">{caseData.title}</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <Card>
@@ -514,7 +510,7 @@ export default function EditCasePage() {
           <div className="flex justify-end space-x-4">
             <Button
               type="button"
-              onClick={() => router.push(`/cases/${params.id}`)}
+              onClick={() => router.push(`/cases/${params?.id}`)}
               variant="secondary"
             >
               Cancel

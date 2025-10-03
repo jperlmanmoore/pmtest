@@ -22,7 +22,11 @@ export function RoleSwitcher() {
       <span className="text-sm text-gray-900">Testing as:</span>
       <select
         value={currentTestRole}
-        onChange={(e) => switchTestRole(e.target.value as typeof currentTestRole)}
+        onChange={(e) => {
+          console.log('RoleSwitcher: Switching from', currentTestRole, 'to', e.target.value);
+          switchTestRole(e.target.value as typeof currentTestRole);
+          console.log('RoleSwitcher: Switch completed');
+        }}
         className="px-3 py-1 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 role-dropdown"
         title="Select user role for testing"
         aria-label="Select user role for testing"
@@ -33,6 +37,16 @@ export function RoleSwitcher() {
           </option>
         ))}
       </select>
+      <button
+        onClick={() => {
+          console.log('RoleSwitcher: Resetting to admin');
+          switchTestRole('admin');
+        }}
+        className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
+        title="Reset to Admin"
+      >
+        Reset
+      </button>
       {currentUser && (
         <div className={`px-2 py-1 rounded-full text-xs font-medium ${currentRoleInfo?.color}`}>
           {currentUser.name}

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { User } from '../types';
 
 interface UserContextType {
@@ -68,16 +68,17 @@ const testUsers: Record<string, User> = {
 };
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  // Get initial role from localStorage or default to admin
-  const [currentTestRole, setCurrentTestRole] = useState<'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney'>('admin');
 
-  // Load role from localStorage on mount
-  useEffect(() => {
-    const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
-    if (savedRole && testUsers[savedRole]) {
-      setCurrentTestRole(savedRole);
+  const [currentTestRole, setCurrentTestRole] = useState<'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney'>(() => {
+    // Initialize role safely for SSR
+    if (typeof window !== 'undefined') {
+      const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+      if (savedRole && testUsers[savedRole]) {
+        return savedRole;
+      }
     }
-  }, []);
+    return 'admin';
+  });
 
   // Get current user based on test role
   const currentUser = testUsers[currentTestRole];
@@ -93,8 +94,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Function to switch test role
   const switchTestRole = (role: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => {
+    console.log('UserContext: Switching role from', currentTestRole, 'to', role);
     setCurrentTestRole(role);
-    localStorage.setItem('testUserRole', role);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('testUserRole', role);
+    }
+    console.log('UserContext: Role switched to', role);
   };
 
   return (

@@ -9,38 +9,45 @@ export const standardTaskTemplates: TaskTemplate[] = [
     stage: 'intake',
     tasks: [
       {
-        title: 'Initial Client Consultation',
-        description: 'Conduct initial consultation with client to gather case details and establish rapport',
+        title: 'Initial Call',
+        description: 'Conduct initial consultation with client to gather case details',
+        priority: 'urgent',
+        estimatedDays: 1,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Initial Call Assistant',
+        description: 'Assist with initial client consultation and documentation',
         priority: 'high',
-        estimatedDays: 3,
+        estimatedDays: 1,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Review Contract',
+        description: 'Review and verify client representation contract',
+        priority: 'high',
+        estimatedDays: 2,
         assignedToRole: 'caseManager'
       },
       {
         title: 'Create Case File',
-        description: 'Set up complete case file with all initial documentation and client information',
+        description: 'Set up complete case file with all initial documentation',
         priority: 'high',
         estimatedDays: 1,
         assignedToRole: 'caseManager'
       },
       {
         title: 'Verify Client Information',
-        description: 'Confirm all client contact information, address, and personal details',
+        description: 'Confirm all client contact information and personal details',
         priority: 'medium',
         estimatedDays: 2,
         assignedToRole: 'caseManager'
       },
       {
         title: 'Document Incident Details',
-        description: 'Record complete details of the incident including date, time, location, and witnesses',
+        description: 'Record complete details of the incident including date, time, location',
         priority: 'high',
         estimatedDays: 2,
-        assignedToRole: 'caseManager'
-      },
-      {
-        title: 'Initial Medical Assessment',
-        description: 'Assess immediate medical needs and connect client with appropriate care providers',
-        priority: 'urgent',
-        estimatedDays: 1,
         assignedToRole: 'caseManager'
       }
     ],
@@ -56,18 +63,46 @@ export const standardTaskTemplates: TaskTemplate[] = [
     stage: 'opening',
     tasks: [
       {
+        title: '15 Day Case Review',
+        description: 'Conduct comprehensive 15-day case review and assessment',
+        priority: 'high',
+        estimatedDays: 15,
+        assignedToRole: 'attorney'
+      },
+      {
         title: 'Attorney Assignment',
-        description: 'Assign appropriate attorney based on case type and attorney availability',
+        description: 'Assign appropriate attorney based on case type and availability',
         priority: 'high',
         estimatedDays: 2,
         assignedToRole: 'caseManager'
       },
       {
-        title: 'Case Strategy Development',
-        description: 'Develop initial case strategy and litigation plan',
-        priority: 'high',
+        title: 'AR',
+        description: 'Prepare and send accident report documentation',
+        priority: 'medium',
         estimatedDays: 5,
-        assignedToRole: 'attorney'
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'HI Cards',
+        description: 'Prepare and send health insurance information cards',
+        priority: 'medium',
+        estimatedDays: 3,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'HI Ltr',
+        description: 'Prepare and send health insurance correspondence letter',
+        priority: 'medium',
+        estimatedDays: 3,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'HI Subro',
+        description: 'Handle health insurance subrogation requirements',
+        priority: 'medium',
+        estimatedDays: 7,
+        assignedToRole: 'caseManager'
       },
       {
         title: 'Insurance Investigation',
@@ -77,9 +112,9 @@ export const standardTaskTemplates: TaskTemplate[] = [
         assignedToRole: 'caseManager'
       },
       {
-        title: 'Preliminary Damages Assessment',
-        description: 'Conduct initial assessment of potential damages and case value',
-        priority: 'medium',
+        title: 'Case Strategy Development',
+        description: 'Develop initial case strategy and litigation plan',
+        priority: 'high',
         estimatedDays: 10,
         assignedToRole: 'attorney'
       }
@@ -96,38 +131,66 @@ export const standardTaskTemplates: TaskTemplate[] = [
     stage: 'treating',
     tasks: [
       {
+        title: '30 Day Call',
+        description: 'Conduct 30-day case status call with client',
+        priority: 'medium',
+        estimatedDays: 30,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Initial Med Recs',
+        description: 'Request and collect initial medical records from providers',
+        priority: 'high',
+        estimatedDays: 14,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Bill HI Ltr',
+        description: 'Prepare and send billing letter to health insurance',
+        priority: 'medium',
+        estimatedDays: 5,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'PD Resolved',
+        description: 'Confirm property damage claim resolution status',
+        priority: 'medium',
+        estimatedDays: 21,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Damage Pictures',
+        description: 'Collect and organize property damage photographs',
+        priority: 'medium',
+        estimatedDays: 14,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Injury Pictures',
+        description: 'Collect and organize injury documentation photographs',
+        priority: 'medium',
+        estimatedDays: 14,
+        assignedToRole: 'caseManager'
+      },
+      {
         title: 'Medical Records Collection',
-        description: 'Request and collect all relevant medical records from treating providers',
+        description: 'Request and collect all relevant medical records from providers',
         priority: 'high',
         estimatedDays: 30,
         assignedToRole: 'caseManager'
       },
       {
-        title: 'Medical Provider Interviews',
-        description: 'Interview treating physicians and medical providers for case details',
-        priority: 'medium',
-        estimatedDays: 45,
-        assignedToRole: 'attorney'
-      },
-      {
         title: 'Medical Chronology Creation',
         description: 'Create detailed chronology of medical treatment and recovery',
         priority: 'medium',
-        estimatedDays: 60,
+        estimatedDays: 21,
         assignedToRole: 'caseManager'
-      },
-      {
-        title: 'Medical Expert Consultation',
-        description: 'Consult with medical experts regarding injury causation and prognosis',
-        priority: 'medium',
-        estimatedDays: 90,
-        assignedToRole: 'attorney'
       },
       {
         title: 'Lost Wages Documentation',
         description: 'Document and calculate lost wages and earning capacity',
         priority: 'medium',
-        estimatedDays: 45,
+        estimatedDays: 21,
         assignedToRole: 'caseManager'
       }
     ],
@@ -143,17 +206,87 @@ export const standardTaskTemplates: TaskTemplate[] = [
     stage: 'demandPrep',
     tasks: [
       {
-        title: 'Demand Letter Drafting',
-        description: 'Draft comprehensive settlement demand letter with all supporting documentation',
+        title: 'Demand Authority',
+        description: 'Obtain demand authority and settlement parameters from client',
         priority: 'high',
-        estimatedDays: 14,
+        estimatedDays: 7,
         assignedToRole: 'attorney'
       },
       {
-        title: 'Medical Summary Preparation',
-        description: 'Prepare comprehensive medical summary for demand package',
+        title: 'LOR Liability',
+        description: 'Prepare Letter of Representation for liability insurance',
+        priority: 'high',
+        estimatedDays: 5,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'LOR UM',
+        description: 'Prepare Letter of Representation for underinsured motorist coverage',
+        priority: 'high',
+        estimatedDays: 5,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Dec Page L',
+        description: 'Prepare declaration page for liability coverage',
+        priority: 'medium',
+        estimatedDays: 3,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Dec Page UM',
+        description: 'Prepare declaration page for UM coverage',
+        priority: 'medium',
+        estimatedDays: 3,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'ACM',
+        description: 'Prepare additional claims materials and documentation',
+        priority: 'medium',
+        estimatedDays: 7,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'All Bills/Recs',
+        description: 'Collect and organize all medical bills and records',
+        priority: 'high',
+        estimatedDays: 14,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Draft Demand',
+        description: 'Draft comprehensive settlement demand letter',
         priority: 'high',
         estimatedDays: 10,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Demand Letter Drafting',
+        description: 'Finalize and review settlement demand letter with attorney',
+        priority: 'high',
+        estimatedDays: 5,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Send Liability Demand',
+        description: 'Send completed demand package to liability insurance',
+        priority: 'high',
+        estimatedDays: 2,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Send UM Demand',
+        description: 'Send completed demand package to UM carrier',
+        priority: 'high',
+        estimatedDays: 2,
+        assignedToRole: 'caseManager'
+      },
+      {
+        title: 'Med Pay Demand',
+        description: 'Prepare and send medical payments demand if applicable',
+        priority: 'medium',
+        estimatedDays: 5,
         assignedToRole: 'caseManager'
       },
       {
@@ -165,17 +298,10 @@ export const standardTaskTemplates: TaskTemplate[] = [
       },
       {
         title: 'Supporting Documentation Assembly',
-        description: 'Assemble all supporting documents, photos, and evidence for demand',
+        description: 'Assemble all supporting documents, photos, and evidence',
         priority: 'medium',
-        estimatedDays: 10,
+        estimatedDays: 7,
         assignedToRole: 'caseManager'
-      },
-      {
-        title: 'Demand Review and Approval',
-        description: 'Review demand package and obtain necessary approvals',
-        priority: 'high',
-        estimatedDays: 3,
-        assignedToRole: 'attorney'
       }
     ],
     isActive: true,
@@ -190,8 +316,29 @@ export const standardTaskTemplates: TaskTemplate[] = [
     stage: 'negotiation',
     tasks: [
       {
+        title: 'Initial Offer',
+        description: 'Receive and review initial settlement offer from insurance',
+        priority: 'high',
+        estimatedDays: 14,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Update Client Re Initial Offer',
+        description: 'Update client regarding initial settlement offer and recommendations',
+        priority: 'high',
+        estimatedDays: 3,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Follow Up on Negotiation',
+        description: 'Conduct ongoing negotiation and follow-up with insurance company',
+        priority: 'high',
+        estimatedDays: 21,
+        assignedToRole: 'attorney'
+      },
+      {
         title: 'Initial Settlement Discussions',
-        description: 'Conduct initial settlement discussions and gauge insurance company position',
+        description: 'Conduct initial settlement discussions and gauge insurance position',
         priority: 'high',
         estimatedDays: 7,
         assignedToRole: 'attorney'
@@ -201,13 +348,6 @@ export const standardTaskTemplates: TaskTemplate[] = [
         description: 'Analyze insurance company counter-offers and prepare responses',
         priority: 'high',
         estimatedDays: 14,
-        assignedToRole: 'attorney'
-      },
-      {
-        title: 'Mediation Preparation',
-        description: 'Prepare for potential mediation if negotiations stall',
-        priority: 'medium',
-        estimatedDays: 21,
         assignedToRole: 'attorney'
       },
       {
@@ -236,6 +376,76 @@ export const standardTaskTemplates: TaskTemplate[] = [
     description: 'Standard tasks for finalizing and processing settlement',
     stage: 'settlement',
     tasks: [
+      {
+        title: '30-Day/Closing Letter HI',
+        description: 'Prepare and send 30-day closing letter to health insurance',
+        priority: 'medium',
+        estimatedDays: 5,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Reductions',
+        description: 'Handle any settlement reductions or adjustments',
+        priority: 'medium',
+        estimatedDays: 7,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Bankruptcy?',
+        description: 'Check for any bankruptcy filings that may affect settlement',
+        priority: 'high',
+        estimatedDays: 3,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Prep Settlement Statement',
+        description: 'Prepare comprehensive settlement statement for client review',
+        priority: 'high',
+        estimatedDays: 5,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Send Settlement Statement to CL',
+        description: 'Send settlement statement to client for review and approval',
+        priority: 'high',
+        estimatedDays: 2,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Receive Settlement Statement',
+        description: 'Receive signed settlement statement from client',
+        priority: 'high',
+        estimatedDays: 7,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Check for Liens',
+        description: 'Conduct thorough lien search and resolution',
+        priority: 'high',
+        estimatedDays: 10,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Releases',
+        description: 'Prepare and obtain all necessary release forms',
+        priority: 'high',
+        estimatedDays: 5,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Receive Check',
+        description: 'Receive settlement check from insurance company',
+        priority: 'high',
+        estimatedDays: 14,
+        assignedToRole: 'attorney'
+      },
+      {
+        title: 'Disburse Checks',
+        description: 'Process and disburse settlement funds according to agreement',
+        priority: 'urgent',
+        estimatedDays: 3,
+        assignedToRole: 'attorney'
+      },
       {
         title: 'Settlement Agreement Review',
         description: 'Review and finalize settlement agreement terms',
