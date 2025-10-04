@@ -7,6 +7,7 @@ import { useCases } from '../../hooks/useCases';
 import { useTasks } from '../../hooks/useTasks';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 import { DashboardHeader } from '../../components/dashboard/DashboardHeader';
 import TaskDebugComponent from '../../components/TaskDebugComponent';
 
@@ -172,6 +173,13 @@ export default function DemandPrepPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
+          <Button
+            onClick={() => router.push('/')}
+            variant="secondary"
+            className="mb-4"
+          >
+            ← Back to Dashboard
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900">Demand Prep Cases</h1>
           <p className="text-gray-600 mt-1">Task progress for all demand preparation cases</p>
         </div>

@@ -205,6 +205,13 @@ export default function EditCasePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Button
+            onClick={() => router.push('/')}
+            variant="secondary"
+            className="mb-4"
+          >
+            ← Back to Dashboard
+          </Button>
+          <Button
             onClick={() => router.push(`/cases/${params?.id}`)}
             variant="secondary"
             className="mb-4"

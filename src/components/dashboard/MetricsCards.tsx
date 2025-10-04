@@ -84,12 +84,12 @@ export function MetricsCards({ metrics, cases = [] }: MetricsCardsProps) {
       onClick: () => router.push('/cases?filter=overyear'),
     },
     {
-      title: 'SOL Alert',
-      value: metrics.solCases,
-      icon: 'S',
-      color: 'bg-yellow-500',
+      title: 'Package Tracking',
+      value: '',
+      icon: '📦',
+      color: 'bg-indigo-500',
       clickable: true,
-      onClick: () => router.push('/cases?filter=solalert'),
+      onClick: () => router.push('/packages'),
     },
   ];
 

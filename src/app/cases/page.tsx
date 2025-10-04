@@ -133,6 +133,13 @@ function CasesPageContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
+          <Button
+            onClick={() => router.push('/')}
+            variant="secondary"
+            className="mb-4"
+          >
+            ← Back to Dashboard
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900">
             {stageFilter ? `${getStageDisplayName(stageFilter)} Cases` : 
              filterType ? getFilterDisplayName(filterType) : 'All Cases'}

@@ -2,7 +2,7 @@
 
 console.log('OVERVIEW PAGE: File loaded and executing');
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -79,7 +79,7 @@ interface CaseMatrixData {
   stats: CaseTaskStats;
 }
 
-export default function OverviewPage() {
+function OverviewPageContent() {
   const router = useRouter();
   const { cases, loading: casesLoading } = useCases();
   const { tasks, loading: tasksLoading, updateTask } = useTasks();
@@ -340,6 +340,13 @@ export default function OverviewPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
+          <Button
+            onClick={() => router.push('/')}
+            variant="secondary"
+            className="mb-4"
+          >
+            ← Back to Dashboard
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900">
             {filterStage !== 'all' ? `${getStageDisplayName(filterStage)} Cases` :
              additionalFilter ? getFilterDisplayName(additionalFilter) :
@@ -731,5 +738,20 @@ export default function OverviewPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function OverviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading overview...</p>
+        </div>
+      </div>
+    }>
+      <OverviewPageContent />
+    </Suspense>
   );
 }
