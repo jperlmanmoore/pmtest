@@ -233,3 +233,11 @@ export interface TaskAssignment {
   assignedAt: string;
   assignedBy: string;
 }
+
+export interface DashboardMetrics {
+  openCases: number;
+  closedCases: number;
+  anteLitemCases: number;
+  overOneYearCases: number;
+  solCases: number;
+}
