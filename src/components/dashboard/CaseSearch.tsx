@@ -57,15 +57,28 @@ export function CaseSearch({ cases, onCaseSelect, placeholder = "Search by case 
 
   return (
     <div className="relative mb-6">
+      <label htmlFor="case-search-input" className="sr-only">
+        Search cases by case number or client name
+      </label>
       <div className="relative">
         <input
+          id="case-search-input"
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder={placeholder}
           className="w-full px-4 py-3 pl-12 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          aria-describedby="search-help"
+          aria-expanded={showResults ? "true" : "false"}
+          aria-haspopup="listbox"
+          role="combobox"
+          aria-controls="case-search-results"
+          aria-activedescendant={showResults ? "search-result-0" : undefined}
         />
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div id="search-help" className="sr-only">
+          Type to search for cases. Results will appear below as you type.
+        </div>
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden="true">
           <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -76,8 +89,9 @@ export function CaseSearch({ cases, onCaseSelect, placeholder = "Search by case 
               setSearchQuery('');
               setShowResults(false);
             }}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-100 rounded-r-lg"
             title="Clear search"
+            aria-label="Clear search input"
           >
             <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -87,47 +101,59 @@ export function CaseSearch({ cases, onCaseSelect, placeholder = "Search by case 
       </div>
 
       {showResults && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-1 max-h-96 overflow-y-auto">
-          <CardContent className="p-0">
-            {filteredCases.length > 0 ? (
-              <div className="divide-y divide-gray-200">
-                {filteredCases.map((caseItem) => (
-                  <div
-                    key={caseItem._id}
-                    onClick={() => handleCaseClick(caseItem)}
-                    className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-medium text-gray-900">{caseItem.caseNumber}</span>
-                          <Badge className={getStageColor(caseItem.stage)}>
-                            {caseItem.stage}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {caseItem.clientId.name} - {caseItem.title}
-                        </p>
-                        {caseItem.statuteOfLimitations && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            SOL: {new Date(caseItem.statuteOfLimitations.solDate).toLocaleDateString()}
+        <div id="case-search-results" className="absolute top-full left-0 right-0 z-50 mt-1 max-h-96 overflow-y-auto" role="listbox" aria-label="Case search results">
+          <Card>
+            <CardContent className="p-0">
+              {filteredCases.length > 0 ? (
+                <div className="divide-y divide-gray-200">
+                  {filteredCases.map((caseItem, index) => (
+                    <div
+                      key={caseItem._id}
+                      id={`search-result-${index}`}
+                      onClick={() => handleCaseClick(caseItem)}
+                      className="p-4 hover:bg-gray-50 cursor-pointer transition-colors focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      role="option"
+                      aria-selected="false"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleCaseClick(caseItem);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3">
+                            <span className="font-medium text-gray-900">{caseItem.caseNumber}</span>
+                            <Badge className={getStageColor(caseItem.stage)}>
+                              {caseItem.stage}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {caseItem.clientId.name} - {caseItem.title}
                           </p>
-                        )}
+                          {caseItem.statuteOfLimitations && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              SOL: {new Date(caseItem.statuteOfLimitations.solDate).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <Button size="sm" variant="secondary" aria-label={`View case ${caseItem.title}`}>
+                          View
+                        </Button>
                       </div>
-                      <Button size="sm" variant="secondary">
-                        View
-                      </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                No cases found matching &quot;{searchQuery}&quot;
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500" role="option" aria-selected="false">
+                  No cases found matching &quot;{searchQuery}&quot;
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

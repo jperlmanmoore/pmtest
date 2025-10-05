@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo, memo } from 'react';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { useCases } from '../../hooks/useCases';
@@ -11,11 +12,11 @@ interface AnteLitemAlertProps {
   showCount?: boolean;
 }
 
-export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", showCount = true }: AnteLitemAlertProps) {
+export const AnteLitemAlert = memo(function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", showCount = true }: AnteLitemAlertProps) {
   const { cases } = useCases();
   const router = useRouter();
 
-  const getCaseType = (title: string): string => {
+  const getCaseType = useMemo(() => (title: string): string => {
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('car accident')) return 'Car Accident';
     if (lowerTitle.includes('slip and fall')) return 'Slip and Fall';
@@ -23,9 +24,9 @@ export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", sh
     if (lowerTitle.includes('sexual assault')) return 'Sexual Assault';
     if (lowerTitle.includes('dog bite')) return 'Dog Bite';
     return 'Other';
-  };
+  }, []);
 
-  const getCaseSummary = (caseItem: Case): string => {
+  const getCaseSummary = useMemo(() => (caseItem: Case): string => {
     const caseType = getCaseType(caseItem.title);
     const isPremisesCase = caseType === 'Slip and Fall' || caseType === 'Apartment';
     
@@ -64,41 +65,44 @@ export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", sh
     }
     
     return summary;
-  };
+  }, [getCaseType]);
 
-  // Filter cases that require ante litem and have deadlines
-  const anteLitemCases = cases.filter(c =>
-    c.anteLitemRequired &&
-    c.anteLitemDeadline &&
-    c.stage !== 'closed'
-  );
+  // Memoized calculations for performance
+  const sortedCases = useMemo(() => {
+    // Filter cases that require ante litem and have deadlines
+    const anteLitemCases = cases.filter(c =>
+      c.anteLitemRequired &&
+      c.anteLitemDeadline &&
+      c.stage !== 'closed'
+    );
 
-  // Filter cases within 90 days of ante litem deadline
-  const urgentAnteLitemCases = anteLitemCases.filter(caseItem => {
-    const deadline = new Date(caseItem.anteLitemDeadline!);
-    const ninetyDaysFromNow = new Date();
-    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
-    return deadline <= ninetyDaysFromNow;
-  });
+    // Filter cases within 90 days of ante litem deadline
+    const urgentAnteLitemCases = anteLitemCases.filter(caseItem => {
+      const deadline = new Date(caseItem.anteLitemDeadline!);
+      const ninetyDaysFromNow = new Date();
+      ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+      return deadline <= ninetyDaysFromNow;
+    });
 
-  // Sort by deadline (closest first)
-  const sortedCases = urgentAnteLitemCases.sort((a, b) => {
-    const dateA = new Date(a.anteLitemDeadline!);
-    const dateB = new Date(b.anteLitemDeadline!);
-    return dateA.getTime() - dateB.getTime();
-  });
+    // Sort by deadline (closest first)
+    return urgentAnteLitemCases.sort((a, b) => {
+      const dateA = new Date(a.anteLitemDeadline!);
+      const dateB = new Date(b.anteLitemDeadline!);
+      return dateA.getTime() - dateB.getTime();
+    });
+  }, [cases]);
 
-  const getDaysUntilDeadline = (deadline: string) => {
+  const getDaysUntilDeadline = useMemo(() => (deadline: string) => {
     const deadlineDate = new Date(deadline);
     const today = new Date();
     const diffTime = deadlineDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
-  };
+  }, []);
 
-  const handleCaseClick = (caseItem: Case) => {
+  const handleCaseClick = useMemo(() => (caseItem: Case) => {
     router.push(`/cases/${caseItem._id}`);
-  };
+  }, [router]);
 
   if (sortedCases.length === 0) {
     return null;
@@ -154,4 +158,4 @@ export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", sh
       </CardContent>
     </Card>
   );
-}
+});
