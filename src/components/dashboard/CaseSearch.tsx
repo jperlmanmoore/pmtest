@@ -73,7 +73,7 @@ export function CaseSearch({ cases, onCaseSelect, placeholder = "Search by case 
           aria-haspopup="listbox"
           role="combobox"
           aria-controls="case-search-results"
-          aria-activedescendant={showResults ? "search-result-0" : undefined}
+          aria-activedescendant={showResults && filteredCases.length > 0 ? "search-result-0" : undefined}
         />
         <div id="search-help" className="sr-only">
           Type to search for cases. Results will appear below as you type.

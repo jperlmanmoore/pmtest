@@ -97,7 +97,7 @@ export default function CaseDetailPage() {
           >
             ← Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-slate-900">{caseData.title}</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{caseData.clientId.name}</h1>
           <p className="text-slate-600 mt-1">Case Number: {caseData.caseNumber}</p>
           <div className="flex items-center space-x-4 mt-4">
             <Badge className={getStageColor(caseData.stage)}>
