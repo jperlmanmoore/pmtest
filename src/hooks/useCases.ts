@@ -7,6 +7,33 @@ export function useCases() {
   const [cases, setCases] = useState<Case[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Validation functions
+  const validateCase = (caseData: unknown): caseData is Case => {
+    if (!caseData || typeof caseData !== 'object') return false;
+    const data = caseData as Record<string, unknown>;
+    if (!data._id || !data.caseNumber || !data.title) return false;
+    if (!data.clientId || typeof data.clientId !== 'object') return false;
+    const clientId = data.clientId as Record<string, unknown>;
+    if (!clientId._id || !clientId.name) return false;
+    if (!['intake', 'treating', 'demandPrep', 'negotiation', 'settlement', 'closed'].includes(data.stage as string)) return false;
+    return true;
+  };
+
+  const validateClient = (clientData: unknown): clientData is Client => {
+    if (!clientData || typeof clientData !== 'object') return false;
+    const data = clientData as Record<string, unknown>;
+    if (!data._id || !data.name) return false;
+    return true;
+  };
+
+  const validateCaseFormData = (formData: unknown): formData is CaseFormData => {
+    if (!formData || typeof formData !== 'object') return false;
+    const data = formData as Record<string, unknown>;
+    if (!data.title || !data.clientId || !data.stage) return false;
+    return true;
+  };
 
   // Mock data for demonstration
   useEffect(() => {
@@ -17,7 +44,18 @@ export function useCases() {
         let allCases: Case[] = [];
 
         if (storedCases) {
-          allCases = JSON.parse(storedCases);
+          const parsedCases = JSON.parse(storedCases);
+          if (Array.isArray(parsedCases)) {
+            // Validate each case
+            const validCases = parsedCases.filter(validateCase);
+            if (validCases.length !== parsedCases.length) {
+              console.warn(`Found ${parsedCases.length - validCases.length} invalid cases in localStorage, using only valid ones`);
+            }
+            allCases = validCases;
+          } else {
+            console.warn('Invalid cases data in localStorage, using mock data');
+            setError('Invalid stored case data, using defaults');
+          }
         } else {
           // Use mock data as initial data
           allCases = [
@@ -393,8 +431,10 @@ export function useCases() {
         }
 
         setCases(allCases);
+        setError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error loading cases from localStorage:', error);
+        setError('Failed to load case data');
         // Fallback to mock data
         setCases([
           {
@@ -422,34 +462,53 @@ export function useCases() {
         ]);
       }
 
-      setClients([
-        { _id: '1', name: 'John Doe', email: 'john@example.com', phone: '555-0101' },
-        { _id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '555-0102' },
-        { _id: '3', name: 'Bob Johnson', email: 'bob@example.com', phone: '555-0103' },
-        { _id: '4', name: 'Alice Brown', email: 'alice@example.com', phone: '555-0104' },
-        { _id: '5', name: 'Charlie Wilson', email: 'charlie@example.com', phone: '555-0105' },
-        { _id: '6', name: 'Diana Prince', email: 'diana@example.com', phone: '555-0106' },
-        { _id: '7', name: 'Edward Norton', email: 'edward@example.com', phone: '555-0107' },
-        { _id: '8', name: 'Fiona Green', email: 'fiona@example.com', phone: '555-0108' },
-        { _id: '9', name: 'George Miller', email: 'george@example.com', phone: '555-0109' },
-        { _id: '10', name: 'Helen Davis', email: 'helen@example.com', phone: '555-0110' },
-        { _id: '11', name: 'Frank Miller', email: 'frank@example.com', phone: '555-0111' },
-        { _id: '12', name: 'Grace Lee', email: 'grace@example.com', phone: '555-0112' },
-        { _id: '13', name: 'Henry Clark', email: 'henry@example.com', phone: '555-0113' },
-        { _id: '14', name: 'Ivy Chen', email: 'ivy@example.com', phone: '555-0114' },
-        { _id: '15', name: 'Jack Taylor', email: 'jack@example.com', phone: '555-0115' },
-        { _id: '16', name: 'Karen White', email: 'karen@example.com', phone: '555-0116' },
-        { _id: '17', name: 'Larry Brown', email: 'larry@example.com', phone: '555-0117' },
-        { _id: '18', name: 'Mary Johnson', email: 'mary@example.com', phone: '555-0118' },
-      ]);
+      // Set up clients with validation
+      try {
+        const mockClients = [
+          { _id: '1', name: 'John Doe', email: 'john@example.com', phone: '555-0101' },
+          { _id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '555-0102' },
+          { _id: '3', name: 'Bob Johnson', email: 'bob@example.com', phone: '555-0103' },
+          { _id: '4', name: 'Alice Brown', email: 'alice@example.com', phone: '555-0104' },
+          { _id: '5', name: 'Charlie Wilson', email: 'charlie@example.com', phone: '555-0105' },
+          { _id: '6', name: 'Diana Prince', email: 'diana@example.com', phone: '555-0106' },
+          { _id: '7', name: 'Edward Norton', email: 'edward@example.com', phone: '555-0107' },
+          { _id: '8', name: 'Fiona Green', email: 'fiona@example.com', phone: '555-0108' },
+          { _id: '9', name: 'George Miller', email: 'george@example.com', phone: '555-0109' },
+          { _id: '10', name: 'Helen Davis', email: 'helen@example.com', phone: '555-0110' },
+          { _id: '11', name: 'Frank Miller', email: 'frank@example.com', phone: '555-0111' },
+          { _id: '12', name: 'Grace Lee', email: 'grace@example.com', phone: '555-0112' },
+          { _id: '13', name: 'Henry Clark', email: 'henry@example.com', phone: '555-0113' },
+          { _id: '14', name: 'Ivy Chen', email: 'ivy@example.com', phone: '555-0114' },
+          { _id: '15', name: 'Jack Taylor', email: 'jack@example.com', phone: '555-0115' },
+          { _id: '16', name: 'Karen White', email: 'karen@example.com', phone: '555-0116' },
+          { _id: '17', name: 'Larry Brown', email: 'larry@example.com', phone: '555-0117' },
+          { _id: '18', name: 'Mary Johnson', email: 'mary@example.com', phone: '555-0118' },
+        ];
+
+        const validClients = mockClients.filter(validateClient);
+        setClients(validClients);
+      } catch (error) {
+        console.error('Error setting up clients:', error);
+        setError('Failed to load client data');
+      }
 
       setLoading(false);
     }, 1000);
   }, []);
 
   const addCase = (caseData: CaseFormData) => {
+    if (!validateCaseFormData(caseData)) {
+      console.error('Invalid case form data provided');
+      setError('Invalid case data provided');
+      return;
+    }
+
     const client = clients.find(c => c._id === caseData.clientId);
-    if (!client) return;
+    if (!client) {
+      console.error('Client not found for case creation');
+      setError('Client not found');
+      return;
+    }
 
     // Generate next case number
     const existingNumbers = cases.map(c => parseInt(c.caseNumber)).filter(n => !isNaN(n));
@@ -498,16 +557,28 @@ export function useCases() {
       const updatedCases = [...prev, newCase];
       try {
         localStorage.setItem('pmtest_cases', JSON.stringify(updatedCases));
+        setError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error saving cases to localStorage:', error);
+        setError('Failed to save case data');
       }
       return updatedCases;
     });
   };
 
   const updateCase = (id: string, caseData: CaseFormData) => {
+    if (!validateCaseFormData(caseData)) {
+      console.error('Invalid case form data provided');
+      setError('Invalid case data provided');
+      return;
+    }
+
     const client = clients.find(c => c._id === caseData.clientId);
-    if (!client) return;
+    if (!client) {
+      console.error('Client not found for case update');
+      setError('Client not found');
+      return;
+    }
 
     setCases(prev => {
       const updatedCases = prev.map(c =>
@@ -552,20 +623,30 @@ export function useCases() {
       );
       try {
         localStorage.setItem('pmtest_cases', JSON.stringify(updatedCases));
+        setError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error saving cases to localStorage:', error);
+        setError('Failed to save case data');
       }
       return updatedCases;
     });
   };
 
   const deleteCase = (id: string) => {
+    if (!id || typeof id !== 'string') {
+      console.error('Invalid case ID provided for deletion');
+      setError('Invalid case ID');
+      return;
+    }
+
     setCases(prev => {
       const updatedCases = prev.filter(c => c._id !== id);
       try {
         localStorage.setItem('pmtest_cases', JSON.stringify(updatedCases));
+        setError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error saving cases to localStorage:', error);
+        setError('Failed to save case data');
       }
       return updatedCases;
     });
@@ -601,6 +682,7 @@ export function useCases() {
     cases,
     clients,
     loading,
+    error,
     addCase,
     updateCase,
     deleteCase,

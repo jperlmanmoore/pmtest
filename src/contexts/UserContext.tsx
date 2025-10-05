@@ -15,6 +15,7 @@ interface UserContextType {
   isQualityControl: boolean;
   switchTestRole: (role: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => void;
   currentTestRole: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+  error: string | null;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -68,13 +69,29 @@ const testUsers: Record<string, User> = {
 };
 
 export function UserProvider({ children }: { children: ReactNode }) {
+  const [error, setError] = useState<string | null>(null);
+
+  // Validation function for user data
+  const validateUser = (userData: unknown): userData is User => {
+    if (!userData || typeof userData !== 'object') return false;
+    const user = userData as Record<string, unknown>;
+    if (!user._id || !user.email || !user.name || !user.role) return false;
+    const validRoles = ['admin', 'attorney', 'caseManager', 'accountant', 'intake'];
+    if (!validRoles.includes(user.role as string)) return false;
+    return true;
+  };
 
   const [currentTestRole, setCurrentTestRole] = useState<'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney'>(() => {
     // Initialize role safely for SSR
     if (typeof window !== 'undefined') {
-      const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
-      if (savedRole && testUsers[savedRole]) {
-        return savedRole;
+      try {
+        const savedRole = localStorage.getItem('testUserRole') as 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney';
+        if (savedRole && testUsers[savedRole]) {
+          return savedRole;
+        }
+      } catch (error) {
+        console.error('Error reading user role from localStorage:', error);
+        setError('Failed to load user preferences');
       }
     }
     return 'admin';
@@ -82,6 +99,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Get current user based on test role
   const currentUser = testUsers[currentTestRole];
+
+  // Validate current user
+  if (!validateUser(currentUser)) {
+    console.error('Invalid user data detected');
+    setError('Invalid user configuration');
+  }
 
   // Role checking functions
   const isAdmin = currentUser?.role === 'admin';
@@ -94,10 +117,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Function to switch test role
   const switchTestRole = (role: 'admin' | 'manager' | 'qualityControl' | 'intake' | 'caseManager' | 'accountant' | 'attorney') => {
+    if (!testUsers[role]) {
+      console.error('Invalid role provided:', role);
+      setError('Invalid user role selected');
+      return;
+    }
+
     console.log('UserContext: Switching role from', currentTestRole, 'to', role);
     setCurrentTestRole(role);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('testUserRole', role);
+      try {
+        localStorage.setItem('testUserRole', role);
+        setError(null); // Clear any previous errors
+      } catch (error) {
+        console.error('Error saving user role to localStorage:', error);
+        setError('Failed to save user preferences');
+      }
     }
     console.log('UserContext: Role switched to', role);
   };
@@ -115,6 +150,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       isQualityControl,
       switchTestRole,
       currentTestRole,
+      error,
     }}>
       {children}
     </UserContext.Provider>

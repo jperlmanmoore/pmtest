@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -8,7 +8,7 @@ import { Button } from '../ui/Button';
 import { useCases } from '../../hooks/useCases';
 import { Case } from '../../types';
 
-export function StatuteOfLimitationsAlert() {
+export const StatuteOfLimitationsAlert = memo(function StatuteOfLimitationsAlert() {
   const router = useRouter();
   const { cases } = useCases();
 
@@ -226,4 +226,4 @@ export function StatuteOfLimitationsAlert() {
       </CardContent>
     </Card>
   );
-}
+});
