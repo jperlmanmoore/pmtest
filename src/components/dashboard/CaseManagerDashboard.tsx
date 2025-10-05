@@ -42,7 +42,7 @@ export function CaseManagerDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Statute of Limitations Alert */}
-      <StatuteOfLimitationsAlert title="Cases Within 6 Months of SOL" />
+      <StatuteOfLimitationsAlert />
 
       {/* Ante Litem Alert */}
       <AnteLitemAlert title="Cases Requiring Ante Litem Notice" />

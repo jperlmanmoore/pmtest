@@ -166,6 +166,57 @@ export default function DemandPrepPage() {
     }
   };
 
+  const getCaseType = (title: string): string => {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('car accident')) return 'Car Accident';
+    if (lowerTitle.includes('slip and fall')) return 'Slip and Fall';
+    if (lowerTitle.includes('apartment')) return 'Apartment';
+    if (lowerTitle.includes('sexual assault')) return 'Sexual Assault';
+    if (lowerTitle.includes('dog bite')) return 'Dog Bite';
+    return 'Other';
+  };
+
+  const getCaseSummary = (caseItem: Case): string => {
+    const caseType = getCaseType(caseItem.title);
+    const isPremisesCase = caseType === 'Slip and Fall' || caseType === 'Apartment';
+    
+    // Get injury description from description or medical providers
+    let injuryDescription = '';
+    if (caseItem.description) {
+      // Extract key injury information from description
+      const desc = caseItem.description.toLowerCase();
+      if (desc.includes('fracture') || desc.includes('broken')) injuryDescription = 'Fractures';
+      else if (desc.includes('concussion') || desc.includes('head injury')) injuryDescription = 'Head Injury';
+      else if (desc.includes('back') || desc.includes('spine')) injuryDescription = 'Back/Spinal';
+      else if (desc.includes('neck')) injuryDescription = 'Neck Injury';
+      else if (desc.includes('shoulder')) injuryDescription = 'Shoulder Injury';
+      else if (desc.includes('knee')) injuryDescription = 'Knee Injury';
+      else if (desc.includes('wrist') || desc.includes('ankle')) injuryDescription = 'Extremity Injury';
+      else if (desc.includes('burn')) injuryDescription = 'Burns';
+      else if (desc.includes('laceration') || desc.includes('cut')) injuryDescription = 'Lacerations';
+      else injuryDescription = 'Personal Injury';
+    } else if (caseItem.medicalProviders && caseItem.medicalProviders.length > 0) {
+      // Use medical provider specialties as injury indicators
+      const specialties = caseItem.medicalProviders.map(p => p.specialty).filter(Boolean);
+      if (specialties.includes('Orthopedic Surgery') || specialties.includes('Orthopedics')) injuryDescription = 'Orthopedic';
+      else if (specialties.includes('Neurology') || specialties.includes('Neurosurgery')) injuryDescription = 'Neurological';
+      else if (specialties.includes('Emergency Medicine')) injuryDescription = 'Emergency Care';
+      else injuryDescription = 'Medical Treatment';
+    } else {
+      injuryDescription = 'Personal Injury';
+    }
+    
+    // Build summary
+    let summary = `${caseType} - ${injuryDescription}`;
+    
+    // Add location for premises cases
+    if (isPremisesCase && caseItem.placeOfIncident) {
+      summary += ` at ${caseItem.placeOfIncident}`;
+    }
+    
+    return summary;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader onAddCase={() => {}} showAddForm={false} />
@@ -264,16 +315,16 @@ export default function DemandPrepPage() {
                               <div className="min-w-[200px]">
                                 <div className="font-medium text-gray-900 cursor-pointer hover:text-blue-600"
                                      onClick={() => router.push(`/cases/${caseId}`)}>
-                                  {caseData.case.title}
+                                  {caseData.case.clientId?.name}
                                 </div>
-                                <div className="text-sm text-gray-600">{caseData.case.clientId?.name}</div>
+                                <div className="text-sm text-gray-600">{caseData.case.title}</div>
+                                <div className="text-xs text-gray-500 mt-1 max-w-[180px] truncate" title={getCaseSummary(caseData.case)}>
+                                  {getCaseSummary(caseData.case)}
+                                </div>
                                 <div className="flex gap-2 mt-1">
                                   <Badge className={getStageColor(caseData.case.stage)}>
                                     {caseData.case.stage}
                                   </Badge>
-                                  <span className="text-xs text-gray-500">
-                                    {new Date(caseData.case.dateOfLoss).toLocaleDateString()}
-                                  </span>
                                 </div>
                               </div>
                             </td>

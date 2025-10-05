@@ -5,10 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { Case } from '../../../types';
 import { useCases } from '../../../hooks/useCases';
 import { useTasks } from '../../../hooks/useTasks';
+import { useContacts } from '../../../hooks/useContacts';
 import { Button } from '../../../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { TaskList } from '../../../components/TaskList';
+import { ContactList } from '../../../components/ContactList';
 import { DashboardHeader } from '../../../components/dashboard/DashboardHeader';
 
 export default function CaseDetailPage() {
@@ -18,6 +20,15 @@ export default function CaseDetailPage() {
   const caseId = params?.id as string;
   const [caseData, setCaseData] = useState<Case | null>(null);
   const { tasks, updateTask, assignTask, completeTask, loading: tasksLoading } = useTasks(caseId);
+  const {
+    contacts,
+    addContact,
+    updateContact,
+    deleteContact,
+    linkContactToCase,
+    unlinkContactFromCase,
+    searchGlobalContacts
+  } = useContacts(caseId);
 
   useEffect(() => {
     if (params?.id && cases.length > 0) {
@@ -86,8 +97,8 @@ export default function CaseDetailPage() {
           >
             ← Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">{caseData.title}</h1>
-          <p className="text-gray-600 mt-1">Case Number: {caseData.caseNumber}</p>
+          <h1 className="text-3xl font-bold text-slate-900">{caseData.title}</h1>
+          <p className="text-slate-600 mt-1">Case Number: {caseData.caseNumber}</p>
           <div className="flex items-center space-x-4 mt-4">
             <Badge className={getStageColor(caseData.stage)}>
               {caseData.stage}
@@ -118,39 +129,39 @@ export default function CaseDetailPage() {
             {/* Basic Information */}
             <Card>
               <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-900">Basic Information</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Basic Information</h2>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Client</label>
-                    <p className="mt-1 text-sm text-gray-900">{caseData.clientId.name}</p>
+                    <label className="block text-sm font-medium text-slate-700">Client</label>
+                    <p className="mt-1 text-sm text-slate-900">{caseData.clientId.name}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Date of Loss</label>
-                    <p className="mt-1 text-sm text-gray-900">
+                    <label className="block text-sm font-medium text-slate-700">Date of Loss</label>
+                    <p className="mt-1 text-sm text-slate-900">
                       {new Date(caseData.dateOfLoss).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <p className="mt-1 text-sm text-gray-900">{caseData.description}</p>
+                    <label className="block text-sm font-medium text-slate-700">Description</label>
+                    <p className="mt-1 text-sm text-slate-900">{caseData.description}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Ante Litem Required</label>
-                    <p className="mt-1 text-sm text-gray-900">
+                    <label className="block text-sm font-medium text-slate-700">Ante Litem Required</label>
+                    <p className="mt-1 text-sm text-slate-900">
                       {caseData.anteLitemRequired ? 'Yes' : 'No'}
                     </p>
                   </div>
                   {caseData.anteLitemRequired && (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Ante Litem Agency</label>
-                        <p className="mt-1 text-sm text-gray-900">{caseData.anteLitemAgency}</p>
+                        <label className="block text-sm font-medium text-slate-700">Ante Litem Agency</label>
+                        <p className="mt-1 text-sm text-slate-900">{caseData.anteLitemAgency}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Ante Litem Deadline</label>
-                        <p className="mt-1 text-sm text-gray-900">
+                        <label className="block text-sm font-medium text-slate-700">Ante Litem Deadline</label>
+                        <p className="mt-1 text-sm text-slate-900">
                           {caseData.anteLitemDeadline ? new Date(caseData.anteLitemDeadline).toLocaleDateString() : 'N/A'}
                         </p>
                       </div>
@@ -163,21 +174,21 @@ export default function CaseDetailPage() {
             {/* Initial Call Data */}
             <Card>
               <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-900">Initial Call Data</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Initial Call Data</h2>
               </CardHeader>
               <CardContent className="space-y-4">
                 {caseData.narrative && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Narrative</label>
-                    <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{caseData.narrative}</p>
+                    <label className="block text-sm font-medium text-slate-700">Narrative</label>
+                    <p className="mt-1 text-sm text-slate-900 whitespace-pre-wrap">{caseData.narrative}</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {caseData.dateOfIncident && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Date of Incident</label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <label className="block text-sm font-medium text-slate-700">Date of Incident</label>
+                      <p className="mt-1 text-sm text-slate-900">
                         {new Date(caseData.dateOfIncident).toLocaleDateString()}
                       </p>
                     </div>
@@ -185,32 +196,32 @@ export default function CaseDetailPage() {
 
                   {caseData.placeOfIncident && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Place of Incident</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.placeOfIncident}</p>
+                      <label className="block text-sm font-medium text-slate-700">Place of Incident</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.placeOfIncident}</p>
                     </div>
                   )}
 
                   {caseData.incidentReportNumber && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Incident Report Number</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.incidentReportNumber}</p>
+                      <label className="block text-sm font-medium text-slate-700">Incident Report Number</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.incidentReportNumber}</p>
                     </div>
                   )}
 
                   {caseData.reportingAgency && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Reporting Agency</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.reportingAgency}</p>
+                      <label className="block text-sm font-medium text-slate-700">Reporting Agency</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.reportingAgency}</p>
                     </div>
                   )}
                 </div>
 
                 {caseData.otherParties && caseData.otherParties.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Other Parties</label>
+                    <label className="block text-sm font-medium text-slate-700">Other Parties</label>
                     <div className="mt-1 space-y-1">
                       {caseData.otherParties.map((party, index) => (
-                        <p key={index} className="text-sm text-gray-900">• {party}</p>
+                        <p key={index} className="text-sm text-slate-900">• {party}</p>
                       ))}
                     </div>
                   </div>
@@ -222,7 +233,7 @@ export default function CaseDetailPage() {
             {caseData.medicalProviders && caseData.medicalProviders.length > 0 && (
               <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold text-gray-900">Medical Providers</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Medical Providers</h2>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -230,32 +241,32 @@ export default function CaseDetailPage() {
                       <div key={index} className="border border-gray-200 rounded-lg p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Name</label>
-                            <p className="mt-1 text-sm text-gray-900">{provider.name}</p>
+                            <label className="block text-sm font-medium text-slate-700">Name</label>
+                            <p className="mt-1 text-sm text-slate-900">{provider.name}</p>
                           </div>
                           {provider.specialty && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">Specialty</label>
-                              <p className="mt-1 text-sm text-gray-900">{provider.specialty}</p>
+                              <label className="block text-sm font-medium text-slate-700">Specialty</label>
+                              <p className="mt-1 text-sm text-slate-900">{provider.specialty}</p>
                             </div>
                           )}
                           {provider.facility && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">Facility</label>
-                              <p className="mt-1 text-sm text-gray-900">{provider.facility}</p>
+                              <label className="block text-sm font-medium text-slate-700">Facility</label>
+                              <p className="mt-1 text-sm text-slate-900">{provider.facility}</p>
                             </div>
                           )}
                           {provider.contactInfo && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">Contact Info</label>
-                              <p className="mt-1 text-sm text-gray-900">{provider.contactInfo}</p>
+                              <label className="block text-sm font-medium text-slate-700">Contact Info</label>
+                              <p className="mt-1 text-sm text-slate-900">{provider.contactInfo}</p>
                             </div>
                           )}
                         </div>
                         {provider.notes && (
                           <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700">Notes</label>
-                            <p className="mt-1 text-sm text-gray-900">{provider.notes}</p>
+                            <label className="block text-sm font-medium text-slate-700">Notes</label>
+                            <p className="mt-1 text-sm text-slate-900">{provider.notes}</p>
                           </div>
                         )}
                       </div>
@@ -265,10 +276,29 @@ export default function CaseDetailPage() {
               </Card>
             )}
 
+            {/* Contacts */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold text-slate-900">Contacts</h2>
+              </CardHeader>
+              <CardContent>
+                <ContactList
+                  caseId={caseData._id}
+                  contacts={contacts}
+                  onAddContact={addContact}
+                  onUpdateContact={updateContact}
+                  onDeleteContact={deleteContact}
+                  onLinkContactToCase={linkContactToCase}
+                  onUnlinkContactFromCase={unlinkContactFromCase}
+                  onSearchGlobalContacts={searchGlobalContacts}
+                />
+              </CardContent>
+            </Card>
+
             {/* Task Management */}
             <Card>
               <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-900">Task Management</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Task Management</h2>
               </CardHeader>
               <CardContent>
                 {/* Debug Display */}
@@ -305,7 +335,7 @@ export default function CaseDetailPage() {
               return witnesses.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <h2 className="text-xl font-semibold text-gray-900">Witnesses</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Witnesses</h2>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -313,15 +343,15 @@ export default function CaseDetailPage() {
                         <div key={witness._id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => router.push(`/cases/${witness._id}`)}>
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h3 className="text-sm font-medium text-gray-900">{witness.clientId.name}</h3>
-                              <p className="text-sm text-gray-600 mt-1">{witness.title}</p>
-                              <p className="text-sm text-gray-500 mt-1">{witness.description}</p>
+                              <h3 className="text-sm font-medium text-slate-900">{witness.clientId.name}</h3>
+                              <p className="text-sm text-slate-600 mt-1">{witness.title}</p>
+                              <p className="text-sm text-slate-500 mt-1">{witness.description}</p>
                             </div>
                             <Badge className={getStageColor(witness.stage)}>
                               {witness.stage}
                             </Badge>
                           </div>
-                          <div className="mt-3 text-xs text-gray-500">
+                          <div className="mt-3 text-xs text-slate-500">
                             Date of Loss: {new Date(witness.dateOfLoss).toLocaleDateString()}
                           </div>
                         </div>
@@ -338,13 +368,13 @@ export default function CaseDetailPage() {
             {/* Insurance Information */}
             <Card>
               <CardHeader>
-                <h2 className="text-xl font-semibold text-gray-900">Insurance Information</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Insurance Information</h2>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Liability Insurance */}
                 {caseData.liabilityInsurance && caseData.liabilityInsurance.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Liability Insurance</h3>
+                    <h3 className="text-lg font-medium text-slate-900 mb-3">Liability Insurance</h3>
                     <div className="space-y-3">
                       {caseData.liabilityInsurance.map((insurance, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-3">
@@ -375,27 +405,27 @@ export default function CaseDetailPage() {
                 {/* Personal Insurance */}
                 {caseData.personalInsurance && caseData.personalInsurance.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Personal Insurance</h3>
+                    <h3 className="text-lg font-medium text-slate-900 mb-3">Personal Insurance</h3>
                     <div className="space-y-3">
                       {caseData.personalInsurance.map((insurance, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-3">
-                          <p className="font-medium text-gray-900">{insurance.company}</p>
-                          <p className="text-sm text-gray-600">Policy Holder: {insurance.policyHolder}</p>
-                          <p className="text-sm text-gray-600">Policy: {insurance.policyNumber}</p>
+                          <p className="font-medium text-slate-900">{insurance.company}</p>
+                          <p className="text-sm text-slate-600">Policy Holder: {insurance.policyHolder}</p>
+                          <p className="text-sm text-slate-600">Policy: {insurance.policyNumber}</p>
                           {insurance.claimNumber && (
-                            <p className="text-sm text-gray-600">Claim: {insurance.claimNumber}</p>
+                            <p className="text-sm text-slate-600">Claim: {insurance.claimNumber}</p>
                           )}
                           {insurance.adjuster && (
-                            <p className="text-sm text-gray-600">Adjuster: {insurance.adjuster}</p>
+                            <p className="text-sm text-slate-600">Adjuster: {insurance.adjuster}</p>
                           )}
                           {insurance.coverage && (
-                            <p className="text-sm text-gray-600">Coverage: {insurance.coverage}</p>
+                            <p className="text-sm text-slate-600">Coverage: {insurance.coverage}</p>
                           )}
                           {insurance.contactInfo && (
-                            <p className="text-sm text-gray-600">Contact: {insurance.contactInfo}</p>
+                            <p className="text-sm text-slate-600">Contact: {insurance.contactInfo}</p>
                           )}
                           {insurance.notes && (
-                            <p className="text-sm text-gray-600 mt-1">Notes: {insurance.notes}</p>
+                            <p className="text-sm text-slate-600 mt-1">Notes: {insurance.notes}</p>
                           )}
                         </div>
                       ))}
@@ -406,25 +436,25 @@ export default function CaseDetailPage() {
                 {/* Health Insurance */}
                 {caseData.healthInsurance && (
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Health Insurance</h3>
+                    <h3 className="text-lg font-medium text-slate-900 mb-3">Health Insurance</h3>
                     <div className="border border-gray-200 rounded-lg p-3">
-                      <p className="font-medium text-gray-900">{caseData.healthInsurance.company}</p>
-                      <p className="text-sm text-gray-600">Policy Holder: {caseData.healthInsurance.policyHolder}</p>
-                      <p className="text-sm text-gray-600">Policy: {caseData.healthInsurance.policyNumber}</p>
+                      <p className="font-medium text-slate-900">{caseData.healthInsurance.company}</p>
+                      <p className="text-sm text-slate-600">Policy Holder: {caseData.healthInsurance.policyHolder}</p>
+                      <p className="text-sm text-slate-600">Policy: {caseData.healthInsurance.policyNumber}</p>
                       {caseData.healthInsurance.claimNumber && (
-                        <p className="text-sm text-gray-600">Claim: {caseData.healthInsurance.claimNumber}</p>
+                        <p className="text-sm text-slate-600">Claim: {caseData.healthInsurance.claimNumber}</p>
                       )}
                       {caseData.healthInsurance.adjuster && (
-                        <p className="text-sm text-gray-600">Adjuster: {caseData.healthInsurance.adjuster}</p>
+                        <p className="text-sm text-slate-600">Adjuster: {caseData.healthInsurance.adjuster}</p>
                       )}
                       {caseData.healthInsurance.coverage && (
-                        <p className="text-sm text-gray-600">Coverage: {caseData.healthInsurance.coverage}</p>
+                        <p className="text-sm text-slate-600">Coverage: {caseData.healthInsurance.coverage}</p>
                       )}
                       {caseData.healthInsurance.contactInfo && (
-                        <p className="text-sm text-gray-600">Contact: {caseData.healthInsurance.contactInfo}</p>
+                        <p className="text-sm text-slate-600">Contact: {caseData.healthInsurance.contactInfo}</p>
                       )}
                       {caseData.healthInsurance.notes && (
-                        <p className="text-sm text-gray-600 mt-1">Notes: {caseData.healthInsurance.notes}</p>
+                        <p className="text-sm text-slate-600 mt-1">Notes: {caseData.healthInsurance.notes}</p>
                       )}
                     </div>
                   </div>
@@ -436,45 +466,45 @@ export default function CaseDetailPage() {
             {caseData.damages && (
               <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold text-gray-900">Damages</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Damages</h2>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {caseData.damages.propertyDamage && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Property Damage:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm text-slate-600">Property Damage:</span>
+                      <span className="text-sm font-medium text-slate-900">
                         ${caseData.damages.propertyDamage.toLocaleString()}
                       </span>
                     </div>
                   )}
                   {caseData.damages.medicalExpenses && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Medical Expenses:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm text-slate-600">Medical Expenses:</span>
+                      <span className="text-sm font-medium text-slate-900">
                         ${caseData.damages.medicalExpenses.toLocaleString()}
                       </span>
                     </div>
                   )}
                   {caseData.damages.lostWages && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Lost Wages:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm text-slate-600">Lost Wages:</span>
+                      <span className="text-sm font-medium text-slate-900">
                         ${caseData.damages.lostWages.toLocaleString()}
                       </span>
                     </div>
                   )}
                   {caseData.damages.painAndSuffering && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Pain & Suffering:</span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm text-slate-600">Pain & Suffering:</span>
+                      <span className="text-sm font-medium text-slate-900">
                         ${caseData.damages.painAndSuffering.toLocaleString()}
                       </span>
                     </div>
                   )}
                   {caseData.damages.totalEstimated && (
                     <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
-                      <span className="text-sm font-medium text-gray-900">Total Estimated:</span>
-                      <span className="text-sm font-bold text-gray-900">
+                      <span className="text-sm font-medium text-slate-900">Total Estimated:</span>
+                      <span className="text-sm font-bold text-slate-900">
                         ${caseData.damages.totalEstimated.toLocaleString()}
                       </span>
                     </div>
@@ -487,7 +517,7 @@ export default function CaseDetailPage() {
             {caseData.liens && caseData.liens.length > 0 && (
               <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold text-gray-900">Liens</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Liens</h2>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -495,18 +525,18 @@ export default function CaseDetailPage() {
                       <div key={index} className="border border-gray-200 rounded-lg p-3">
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-medium text-gray-900">{lien.holder}</p>
-                            <p className="text-sm text-gray-600">{lien.type}</p>
+                            <p className="font-medium text-slate-900">{lien.holder}</p>
+                            <p className="text-sm text-slate-600">{lien.type}</p>
                             {lien.priority && (
-                              <p className="text-sm text-gray-600">Priority: {lien.priority}</p>
+                              <p className="text-sm text-slate-600">Priority: {lien.priority}</p>
                             )}
                           </div>
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-slate-900">
                             ${lien.amount.toLocaleString()}
                           </span>
                         </div>
                         {lien.notes && (
-                          <p className="text-sm text-gray-600 mt-2">{lien.notes}</p>
+                          <p className="text-sm text-slate-600 mt-2">{lien.notes}</p>
                         )}
                       </div>
                     ))}
@@ -519,18 +549,18 @@ export default function CaseDetailPage() {
             {caseData.statuteOfLimitations && (
               <Card>
                 <CardHeader>
-                  <h2 className="text-xl font-semibold text-gray-900">Statute of Limitations</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">Statute of Limitations</h2>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">SOL Date</label>
-                      <p className="mt-1 text-sm text-gray-900 font-medium">
+                      <label className="block text-sm font-medium text-slate-700">SOL Date</label>
+                      <p className="mt-1 text-sm text-slate-900 font-medium">
                         {new Date(caseData.statuteOfLimitations.solDate).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Status</label>
+                      <label className="block text-sm font-medium text-slate-700">Status</label>
                       <p className={`mt-1 text-sm font-medium ${
                         caseData.statuteOfLimitations.solStatus === 'active' ? 'text-green-600' :
                         caseData.statuteOfLimitations.solStatus === 'expired' ? 'text-red-600' :
@@ -541,8 +571,8 @@ export default function CaseDetailPage() {
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Claim Type</label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <label className="block text-sm font-medium text-slate-700">Claim Type</label>
+                      <p className="mt-1 text-sm text-slate-900">
                         {caseData.statuteOfLimitations.solType === 'personalInjury' ? 'Personal Injury' :
                          caseData.statuteOfLimitations.solType === 'propertyDamage' ? 'Property Damage' :
                          caseData.statuteOfLimitations.solType === 'medicalMalpractice' ? 'Medical Malpractice' :
@@ -552,26 +582,26 @@ export default function CaseDetailPage() {
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">State</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.statuteOfLimitations.solState}</p>
+                      <label className="block text-sm font-medium text-slate-700">State</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.statuteOfLimitations.solState}</p>
                     </div>
                   </div>
 
                   {caseData.statuteOfLimitations.solBasis && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Legal Basis</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.statuteOfLimitations.solBasis}</p>
+                      <label className="block text-sm font-medium text-slate-700">Legal Basis</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.statuteOfLimitations.solBasis}</p>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Warning Period</label>
-                    <p className="mt-1 text-sm text-gray-900">{caseData.statuteOfLimitations.solWarningDays} days before deadline</p>
+                    <label className="block text-sm font-medium text-slate-700">Warning Period</label>
+                    <p className="mt-1 text-sm text-slate-900">{caseData.statuteOfLimitations.solWarningDays} days before deadline</p>
                   </div>
 
                   {caseData.statuteOfLimitations.tollingEvents && caseData.statuteOfLimitations.tollingEvents.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Tolling Events</label>
+                      <label className="block text-sm font-medium text-slate-700">Tolling Events</label>
                       <div className="mt-1">
                         {caseData.statuteOfLimitations.tollingEvents.map((event, index) => (
                           <span key={index} className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-2 mb-1">
@@ -584,8 +614,8 @@ export default function CaseDetailPage() {
 
                   {caseData.statuteOfLimitations.solNotes && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Notes</label>
-                      <p className="mt-1 text-sm text-gray-900">{caseData.statuteOfLimitations.solNotes}</p>
+                      <label className="block text-sm font-medium text-slate-700">Notes</label>
+                      <p className="mt-1 text-sm text-slate-900">{caseData.statuteOfLimitations.solNotes}</p>
                     </div>
                   )}
 

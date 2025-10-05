@@ -31,7 +31,7 @@ export function InsuranceForm({ insurance, type, onAdd, onUpdate, onRemove }: In
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900">{getTitle()}</h3>
+        <h3 className="text-lg font-medium text-slate-900">{getTitle()}</h3>
         <Button
           type="button"
           onClick={onAdd}

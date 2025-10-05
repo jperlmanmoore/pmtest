@@ -42,7 +42,7 @@ export function AttorneyDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Statute of Limitations Alert */}
-      <StatuteOfLimitationsAlert title="My Cases Within 6 Months of SOL" />
+      <StatuteOfLimitationsAlert />
 
       {/* Ante Litem Alert */}
       <AnteLitemAlert title="My Cases Requiring Ante Litem Notice" />
@@ -50,24 +50,24 @@ export function AttorneyDashboard() {
       {/* Case Load Overview */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold text-gray-900">My Case Load</h3>
+          <h3 className="text-lg font-semibold text-slate-900">My Case Load</h3>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span>Active Cases</span>
+              <span className="text-slate-700">Active Cases</span>
               <Badge variant="default">{myCases.length}</Badge>
             </div>
             <div className="flex justify-between items-center">
-              <span>Urgent Deadlines (&lt;30 days)</span>
+              <span className="text-slate-700">Urgent Deadlines (&lt;30 days)</span>
               <Badge variant="danger">{urgentCases}</Badge>
             </div>
             <div className="flex justify-between items-center">
-              <span>Pending Close Requests</span>
+              <span className="text-slate-700">Pending Close Requests</span>
               <Badge variant="warning">{pendingCloseRequests}</Badge>
             </div>
             <div className="flex justify-between items-center">
-              <span>Cases Needing Review</span>
+              <span className="text-slate-700">Cases Needing Review</span>
               <Badge variant="warning">{casesNeedingReview}</Badge>
             </div>
           </div>
@@ -78,7 +78,7 @@ export function AttorneyDashboard() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Urgent Cases</h3>
+            <h3 className="text-lg font-semibold text-slate-900">Urgent Cases</h3>
             <Badge variant="danger">{urgentCases}</Badge>
           </div>
         </CardHeader>
@@ -91,8 +91,8 @@ export function AttorneyDashboard() {
             }).slice(0, 3).map(caseItem => (
               <div key={caseItem._id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                 <div>
-                  <p className="font-medium">{caseItem.title}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-slate-900">{caseItem.title}</p>
+                  <p className="text-sm text-slate-600">
                     SOL: {new Date(caseItem.statuteOfLimitations!.solDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -100,7 +100,7 @@ export function AttorneyDashboard() {
               </div>
             ))}
             {urgentCases === 0 && (
-              <p className="text-gray-500 text-center py-4">No urgent cases</p>
+              <p className="text-slate-500 text-center py-4">No urgent cases</p>
             )}
           </div>
         </CardContent>
@@ -109,25 +109,25 @@ export function AttorneyDashboard() {
       {/* Case Management Actions */}
       <Card className="lg:col-span-2">
         <CardHeader>
-          <h3 className="text-lg font-semibold text-gray-900">Case Management</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Case Management</h3>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{myCases.length}</div>
-              <div className="text-sm text-blue-600">My Cases</div>
+              <div className="text-2xl font-bold text-slate-900">{myCases.length}</div>
+              <div className="text-sm text-slate-700">My Cases</div>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">{pendingCloseRequests}</div>
-              <div className="text-sm text-yellow-600">Pending Closes</div>
+              <div className="text-2xl font-bold text-slate-900">{pendingCloseRequests}</div>
+              <div className="text-sm text-slate-700">Pending Closes</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{casesNeedingReview}</div>
-              <div className="text-sm text-green-600">Need Review</div>
+              <div className="text-2xl font-bold text-slate-900">{casesNeedingReview}</div>
+              <div className="text-sm text-slate-700">Need Review</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{urgentCases}</div>
-              <div className="text-sm text-purple-600">Urgent</div>
+              <div className="text-2xl font-bold text-slate-900">{urgentCases}</div>
+              <div className="text-sm text-slate-700">Urgent</div>
             </div>
           </div>
           <div className="flex justify-center space-x-4">
