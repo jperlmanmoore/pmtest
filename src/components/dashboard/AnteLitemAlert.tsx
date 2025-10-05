@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
 import { useCases } from '../../hooks/useCases';
 import { useRouter } from 'next/navigation';
 import { Case } from '../../types';
@@ -15,6 +14,57 @@ interface AnteLitemAlertProps {
 export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", showCount = true }: AnteLitemAlertProps) {
   const { cases } = useCases();
   const router = useRouter();
+
+  const getCaseType = (title: string): string => {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('car accident')) return 'Car Accident';
+    if (lowerTitle.includes('slip and fall')) return 'Slip and Fall';
+    if (lowerTitle.includes('apartment')) return 'Apartment';
+    if (lowerTitle.includes('sexual assault')) return 'Sexual Assault';
+    if (lowerTitle.includes('dog bite')) return 'Dog Bite';
+    return 'Other';
+  };
+
+  const getCaseSummary = (caseItem: Case): string => {
+    const caseType = getCaseType(caseItem.title);
+    const isPremisesCase = caseType === 'Slip and Fall' || caseType === 'Apartment';
+    
+    // Get injury description from description or medical providers
+    let injuryDescription = '';
+    if (caseItem.description) {
+      // Extract key injury information from description
+      const desc = caseItem.description.toLowerCase();
+      if (desc.includes('fracture') || desc.includes('broken')) injuryDescription = 'Fractures';
+      else if (desc.includes('concussion') || desc.includes('head injury')) injuryDescription = 'Head Injury';
+      else if (desc.includes('back') || desc.includes('spine')) injuryDescription = 'Back/Spinal';
+      else if (desc.includes('neck')) injuryDescription = 'Neck Injury';
+      else if (desc.includes('shoulder')) injuryDescription = 'Shoulder Injury';
+      else if (desc.includes('knee')) injuryDescription = 'Knee Injury';
+      else if (desc.includes('wrist') || desc.includes('ankle')) injuryDescription = 'Extremity Injury';
+      else if (desc.includes('burn')) injuryDescription = 'Burns';
+      else if (desc.includes('laceration') || desc.includes('cut')) injuryDescription = 'Lacerations';
+      else injuryDescription = 'Personal Injury';
+    } else if (caseItem.medicalProviders && caseItem.medicalProviders.length > 0) {
+      // Use medical provider specialties as injury indicators
+      const specialties = caseItem.medicalProviders.map(p => p.specialty).filter(Boolean);
+      if (specialties.includes('Orthopedic Surgery') || specialties.includes('Orthopedics')) injuryDescription = 'Orthopedic';
+      else if (specialties.includes('Neurology') || specialties.includes('Neurosurgery')) injuryDescription = 'Neurological';
+      else if (specialties.includes('Emergency Medicine')) injuryDescription = 'Emergency Care';
+      else injuryDescription = 'Medical Treatment';
+    } else {
+      injuryDescription = 'Personal Injury';
+    }
+    
+    // Build summary
+    let summary = `${caseType} - ${injuryDescription}`;
+    
+    // Add location for premises cases
+    if (isPremisesCase && caseItem.placeOfIncident) {
+      summary += ` at ${caseItem.placeOfIncident}`;
+    }
+    
+    return summary;
+  };
 
   // Filter cases that require ante litem and have deadlines
   const anteLitemCases = cases.filter(c =>
@@ -46,12 +96,6 @@ export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", sh
     return diffDays;
   };
 
-  const getUrgencyColor = (days: number) => {
-    if (days <= 30) return 'danger';
-    if (days <= 60) return 'warning';
-    return 'default';
-  };
-
   const handleCaseClick = (caseItem: Case) => {
     router.push(`/cases/${caseItem._id}`);
   };
@@ -70,43 +114,42 @@ export function AnteLitemAlert({ title = "Cases Requiring Ante Litem Notice", sh
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {sortedCases.slice(0, 5).map(caseItem => {
+          {sortedCases.map(caseItem => {
             const daysUntil = getDaysUntilDeadline(caseItem.anteLitemDeadline!);
-            const urgencyColor = getUrgencyColor(daysUntil);
 
             return (
               <div
                 key={caseItem._id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                className="p-4 rounded-md bg-orange-50 hover:bg-orange-100 cursor-pointer transition-colors border border-orange-200"
                 onClick={() => handleCaseClick(caseItem)}
               >
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{caseItem.title}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-sm text-gray-600">
-                      Deadline: {new Date(caseItem.anteLitemDeadline!).toLocaleDateString()}
-                    </p>
-                    <Badge variant={urgencyColor}>
-                      {daysUntil <= 0 ? 'Overdue' : `${daysUntil} days`}
-                    </Badge>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-900 mb-1">{caseItem.clientId?.name || 'Unknown Client'}</div>
+                    <div className="text-xs text-gray-600 mb-1">{caseItem.title}</div>
+                    <div className="text-xs text-gray-500 mb-2">{getCaseSummary(caseItem)}</div>
+                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                      <span>📅 Loss: {new Date(caseItem.dateOfLoss).toLocaleDateString()}</span>
+                      <span>⚖️ Due: {new Date(caseItem.anteLitemDeadline!).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  {caseItem.anteLitemAgency && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Agency: {caseItem.anteLitemAgency}
-                    </p>
-                  )}
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${
+                      daysUntil <= 0 
+                        ? 'bg-red-100 text-red-800' 
+                        : daysUntil <= 7 
+                          ? 'bg-red-100 text-red-800'
+                          : daysUntil <= 30 
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {daysUntil <= 0 ? 'Overdue' : `${daysUntil} days`}
+                    </span>
+                  </div>
                 </div>
-                <Button size="sm" variant="secondary">View Case</Button>
               </div>
             );
           })}
-          {sortedCases.length > 5 && (
-            <div className="text-center pt-2">
-              <Button variant="secondary" size="sm">
-                View {sortedCases.length - 5} more cases...
-              </Button>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

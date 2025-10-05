@@ -61,6 +61,47 @@ export function CasesTable({ cases }: CasesTableProps) {
     return 'Other';
   };
 
+  const getCaseSummary = (caseItem: Case): string => {
+    const caseType = getCaseType(caseItem.title);
+    const isPremisesCase = caseType === 'Slip and Fall' || caseType === 'Apartment';
+    
+    // Get injury description from description or medical providers
+    let injuryDescription = '';
+    if (caseItem.description) {
+      // Extract key injury information from description
+      const desc = caseItem.description.toLowerCase();
+      if (desc.includes('fracture') || desc.includes('broken')) injuryDescription = 'Fractures';
+      else if (desc.includes('concussion') || desc.includes('head injury')) injuryDescription = 'Head Injury';
+      else if (desc.includes('back') || desc.includes('spine')) injuryDescription = 'Back/Spinal';
+      else if (desc.includes('neck')) injuryDescription = 'Neck Injury';
+      else if (desc.includes('shoulder')) injuryDescription = 'Shoulder Injury';
+      else if (desc.includes('knee')) injuryDescription = 'Knee Injury';
+      else if (desc.includes('wrist') || desc.includes('ankle')) injuryDescription = 'Extremity Injury';
+      else if (desc.includes('burn')) injuryDescription = 'Burns';
+      else if (desc.includes('laceration') || desc.includes('cut')) injuryDescription = 'Lacerations';
+      else injuryDescription = 'Personal Injury';
+    } else if (caseItem.medicalProviders && caseItem.medicalProviders.length > 0) {
+      // Use medical provider specialties as injury indicators
+      const specialties = caseItem.medicalProviders.map(p => p.specialty).filter(Boolean);
+      if (specialties.includes('Orthopedic Surgery') || specialties.includes('Orthopedics')) injuryDescription = 'Orthopedic';
+      else if (specialties.includes('Neurology') || specialties.includes('Neurosurgery')) injuryDescription = 'Neurological';
+      else if (specialties.includes('Emergency Medicine')) injuryDescription = 'Emergency Care';
+      else injuryDescription = 'Medical Treatment';
+    } else {
+      injuryDescription = 'Personal Injury';
+    }
+    
+    // Build summary
+    let summary = `${caseType} - ${injuryDescription}`;
+    
+    // Add location for premises cases
+    if (isPremisesCase && caseItem.placeOfIncident) {
+      summary += ` at ${caseItem.placeOfIncident}`;
+    }
+    
+    return summary;
+  };
+
   const getSOLStatus = (sol?: { solDate: string; solStatus: string }) => {
     if (!sol) return { text: '-', color: 'text-gray-500' };
     
@@ -169,9 +210,9 @@ export function CasesTable({ cases }: CasesTableProps) {
                 <SortableHeader field="statuteOfLimitations">
                   SOL Date
                 </SortableHeader>
-                <SortableHeader field="dateOfLoss">
-                  Date of Loss
-                </SortableHeader>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Case Summary
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tasks
                 </th>
@@ -210,8 +251,10 @@ export function CasesTable({ cases }: CasesTableProps) {
                       {getSOLStatus(caseItem.statuteOfLimitations).text}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDate(caseItem.dateOfLoss)}
+                  <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                    <div className="truncate" title={getCaseSummary(caseItem)}>
+                      {getCaseSummary(caseItem)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {(() => {

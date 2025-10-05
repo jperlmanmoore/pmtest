@@ -100,6 +100,9 @@ export interface Case {
   // Statute of Limitations
   statuteOfLimitations?: StatuteOfLimitations;
 
+  // Contacts
+  contactIds?: string[]; // Array of contact IDs (references to Contact collection)
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -178,6 +181,9 @@ export interface CaseFormData {
 
   // Statute of Limitations
   statuteOfLimitations?: StatuteOfLimitations;
+
+  // Contacts
+  contactIds?: string[]; // Array of contact IDs (references to Contact collection)
 }
 
 export interface Task {
@@ -240,4 +246,27 @@ export interface DashboardMetrics {
   anteLitemCases: number;
   overOneYearCases: number;
   solCases: number;
+}
+
+export interface Contact {
+  _id: string;
+  // Removed caseId - contacts are now global
+  type: 'insurance_company' | 'insurance_adjuster' | 'medical_provider' | 'health_insurance' | 'subrogation_company' | 'pre_settlement_loan';
+  name: string;
+  company?: string; // For individuals working at companies
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  phone: string;
+  fax?: string;
+  email?: string;
+  notes?: string;
+  isPrimary?: boolean; // Mark primary contact for each type
+  isGlobal: boolean; // Whether this contact can be reused across cases
+  linkedCases: string[]; // Array of case IDs this contact is linked to
+  createdAt: string;
+  updatedAt: string;
 }

@@ -12,7 +12,7 @@ export function MedicalProviderForm({ providers, onAdd, onUpdate, onRemove }: Me
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Medical Providers</h3>
+        <h3 className="text-lg font-medium text-slate-900">Medical Providers</h3>
         <Button
           type="button"
           onClick={onAdd}

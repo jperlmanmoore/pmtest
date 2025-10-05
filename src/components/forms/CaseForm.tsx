@@ -107,7 +107,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
   return (
     <Card className="mb-8">
       <CardHeader>
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-slate-900">
           {editingCase ? 'Edit Case' : 'Add New Case'}
         </h2>
       </CardHeader>
@@ -115,7 +115,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Client
               </label>
               <select
@@ -135,7 +135,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Link to Parent Case (Optional)
               </label>
               <select
@@ -153,13 +153,13 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                     </option>
                   ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Select a parent case if this is part of the same incident
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Case Title
               </label>
               <input
@@ -173,7 +173,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Description
               </label>
               <textarea
@@ -186,7 +186,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Stage
               </label>
               <select
@@ -208,7 +208,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Date of Loss
               </label>
               <input
@@ -229,7 +229,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                   onChange={(e) => setForm({ ...form, anteLitemRequired: e.target.checked })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <span className="ml-2 text-sm font-medium text-gray-700">
+                <span className="ml-2 text-sm font-medium text-slate-700">
                   Ante Litem Required
                 </span>
               </label>
@@ -238,7 +238,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
             {form.anteLitemRequired && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Ante Litem Agency
                   </label>
                   <input
@@ -251,7 +251,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Ante Litem Deadline
                   </label>
                   <input
@@ -269,7 +269,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
           {/* Insurance Information Section */}
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Insurance Information</h3>
+              <h3 className="text-lg font-medium text-slate-900">Insurance Information</h3>
               <Button
                 type="button"
                 variant="secondary"
@@ -285,7 +285,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                 {/* Liability Insurance */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-md font-medium text-gray-900">Liability Insurance</h4>
+                    <h4 className="text-md font-medium text-slate-900">Liability Insurance</h4>
                     <Button
                       type="button"
                       variant="secondary"
@@ -300,7 +300,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       {form.liabilityInsurance.map((insurance, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-3">
-                            <h5 className="text-sm font-medium text-gray-900">Insurance #{index + 1}</h5>
+                            <h5 className="text-sm font-medium text-slate-900">Insurance #{index + 1}</h5>
                             <Button
                               type="button"
                               variant="danger"
@@ -312,7 +312,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Insurance Company
                               </label>
                               <input
@@ -324,7 +324,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Holder
                               </label>
                               <input
@@ -336,7 +336,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Number
                               </label>
                               <input
@@ -348,7 +348,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Claim Number
                               </label>
                               <input
@@ -360,7 +360,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Adjuster
                               </label>
                               <input
@@ -372,7 +372,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Coverage
                               </label>
                               <input
@@ -384,7 +384,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Contact Info
                               </label>
                               <input
@@ -396,7 +396,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Notes
                               </label>
                               <textarea
@@ -417,7 +417,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                 {/* Personal Insurance */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-md font-medium text-gray-900">Personal Insurance</h4>
+                    <h4 className="text-md font-medium text-slate-900">Personal Insurance</h4>
                     <Button
                       type="button"
                       variant="secondary"
@@ -432,7 +432,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       {form.personalInsurance.map((insurance, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-3">
-                            <h5 className="text-sm font-medium text-gray-900">Insurance #{index + 1}</h5>
+                            <h5 className="text-sm font-medium text-slate-900">Insurance #{index + 1}</h5>
                             <Button
                               type="button"
                               variant="danger"
@@ -444,7 +444,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Insurance Company
                               </label>
                               <input
@@ -456,7 +456,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Holder
                               </label>
                               <input
@@ -468,7 +468,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Number
                               </label>
                               <input
@@ -480,7 +480,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Claim Number
                               </label>
                               <input
@@ -492,7 +492,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Adjuster
                               </label>
                               <input
@@ -504,7 +504,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Coverage
                               </label>
                               <input
@@ -516,7 +516,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Contact Info
                               </label>
                               <input
@@ -528,7 +528,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Notes
                               </label>
                               <textarea
@@ -549,7 +549,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                 {/* Other Insurance */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-md font-medium text-gray-900">Other Insurance</h4>
+                    <h4 className="text-md font-medium text-slate-900">Other Insurance</h4>
                     <Button
                       type="button"
                       variant="secondary"
@@ -564,7 +564,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       {form.otherInsurance.map((insurance, index) => (
                         <div key={index} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-3">
-                            <h5 className="text-sm font-medium text-gray-900">Insurance #{index + 1}</h5>
+                            <h5 className="text-sm font-medium text-slate-900">Insurance #{index + 1}</h5>
                             <Button
                               type="button"
                               variant="danger"
@@ -576,7 +576,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Insurance Company
                               </label>
                               <input
@@ -588,7 +588,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Holder
                               </label>
                               <input
@@ -600,7 +600,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Policy Number
                               </label>
                               <input
@@ -612,7 +612,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Claim Number
                               </label>
                               <input
@@ -624,7 +624,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Adjuster
                               </label>
                               <input
@@ -636,7 +636,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Coverage
                               </label>
                               <input
@@ -648,7 +648,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Contact Info
                               </label>
                               <input
@@ -660,7 +660,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                               />
                             </div>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
                                 Notes
                               </label>
                               <textarea
@@ -680,11 +680,11 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
 
                 {/* Health Insurance */}
                 <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-3">Health Insurance</h4>
+                  <h4 className="text-md font-medium text-slate-900 mb-3">Health Insurance</h4>
                   <div className="border border-gray-200 rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Insurance Company
                         </label>
                         <input
@@ -696,7 +696,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Policy Holder
                         </label>
                         <input
@@ -708,7 +708,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Policy Number
                         </label>
                         <input
@@ -720,7 +720,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Claim Number
                         </label>
                         <input
@@ -732,7 +732,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Adjuster
                         </label>
                         <input
@@ -744,7 +744,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Coverage
                         </label>
                         <input
@@ -756,7 +756,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Contact Info
                         </label>
                         <input
@@ -768,7 +768,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
                           Notes
                         </label>
                         <textarea
@@ -789,7 +789,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
           {/* Statute of Limitations Section */}
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Statute of Limitations</h3>
+              <h3 className="text-lg font-medium text-slate-900">Statute of Limitations</h3>
               <Button
                 type="button"
                 variant="secondary"
@@ -805,7 +805,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         SOL Date *
                       </label>
                       <input
@@ -817,7 +817,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Claim Type *
                       </label>
                       <select
@@ -836,7 +836,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         State *
                       </label>
                       <input
@@ -849,7 +849,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Status *
                       </label>
                       <select
@@ -866,7 +866,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Warning Days
                       </label>
                       <input
@@ -880,7 +880,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Legal Basis
                       </label>
                       <input
@@ -893,7 +893,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Tolling Events
                       </label>
                       <input
@@ -906,7 +906,7 @@ export function CaseForm({ clients, cases, editingCase, onSubmit, onCancel }: Ca
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         SOL Notes
                       </label>
                       <textarea

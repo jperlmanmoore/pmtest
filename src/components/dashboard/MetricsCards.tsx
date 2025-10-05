@@ -108,10 +108,10 @@ export function MetricsCards({ metrics, cases = [] }: MetricsCardsProps) {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">{card.title}</p>
-              <p className="text-2xl font-bold text-gray-900">{card.value || 'View'}</p>
+              <p className="text-sm font-medium text-slate-500">{card.title}</p>
+              <p className="text-2xl font-bold text-slate-900">{card.value || 'View'}</p>
               {card.subtitle && (
-                <p className="text-xs text-gray-400 mt-1">{card.subtitle}</p>
+                <p className="text-xs text-slate-900 mt-1">{card.subtitle}</p>
               )}
             </div>
           </div>

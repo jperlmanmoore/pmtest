@@ -54,7 +54,7 @@ export function getStageColor(stage: string): string {
     case 'probate':
       return 'bg-pink-100 text-pink-800';
     case 'closed':
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-100 text-slate-800';
     default:
       return 'bg-slate-100 text-slate-800';
   }
